@@ -26,7 +26,6 @@ from django.shortcuts import render
 # import pandas as pd
 import requests
 import re
-from .secrets import openai
 from django.http import HttpResponse
 
 
