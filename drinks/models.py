@@ -45,7 +45,6 @@ class Recipe(models.Model):
     dateAdded = models.DateTimeField(default=timezone.now)
     userID = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipesAdded', null=True, blank=True)
 
-
     def __str__(self):
         return self.title
 
