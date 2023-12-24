@@ -27,7 +27,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['dolphin-app-3vsmx.ondigitalocean.app', 'recipe-jar.com', 'localhost']
+ALLOWED_HOSTS = ['dolphin-app-3vsmx.ondigitalocean.app', 'recipe-jar.com', 'localhost', '24.144.69.48']
 
 CSRF_TRUSTED_ORIGINS = ['https://whiskapps.com', 'https://127.0.0.1:8000']
 
