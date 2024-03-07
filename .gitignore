@@ -4,3 +4,5 @@ error.log
 output.log
 secrets.py
 venv
+
+.idea/

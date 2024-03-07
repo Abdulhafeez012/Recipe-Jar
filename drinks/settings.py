@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import sys
 from django.core.management.utils import get_random_secret_key
+from apps.my_apps import MY_APPS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,22 +28,35 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', get_random_secret_key())
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ['dolphin-app-3vsmx.ondigitalocean.app', 'recipe-jar.com', 'localhost', '24.144.69.48']
+ALLOWED_HOSTS = [
+    'dolphin-app-3vsmx.ondigitalocean.app',
+    'recipe-jar.com',
+    'localhost',
+    '24.144.69.48'
+]
 
-CSRF_TRUSTED_ORIGINS = ['https://whiskapps.com', 'https://127.0.0.1:8000']
+# CSRF_TRUSTED_ORIGINS = [
+#     'https://whiskapps.com',
+#     'https://127.0.0.1:8000'
+# ]
 
 # Application definition
 
 INSTALLED_APPS = [
-    'rest_framework',
-    'drinks',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # DRF
+    'rest_framework',
+
+    # Third Party Apps
 ]
+
+INSTALLED_APPS += MY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -79,19 +93,19 @@ WSGI_APPLICATION = 'drinks.wsgi.application'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 DEVELOPMENT_MODE = os.getenv("DEVELOPMENT_MODE", "False") == "True"
 
-if DEVELOPMENT_MODE is True:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-        }
+# if DEVELOPMENT_MODE is True:
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
-elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
-    if os.getenv("DATABASE_URL", None) is None:
-        raise Exception("DATABASE_URL environment variable not defined")
-    DATABASES = {
-        "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
-    }
+}
+# elif len(sys.argv) > 0 and sys.argv[1] != 'collectstatic':
+#     if os.getenv("DATABASE_URL", None) is None:
+#         raise Exception("DATABASE_URL environment variable not defined")
+#     DATABASES = {
+#         "default": dj_database_url.parse(os.environ.get("DATABASE_URL")),
+#     }
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
