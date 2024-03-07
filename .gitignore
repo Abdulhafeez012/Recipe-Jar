@@ -4,5 +4,5 @@ error.log
 output.log
 secrets.py
 venv
-
 .idea/
+.DS_Store
