@@ -825,7 +825,8 @@ def get_home_screen_data(request):
 
             returned_shopping_list = {
                 "shoppingListName": shopping_list_category.name,
-                "items": new_list_of_items
+                "shootingListID": str(shopping_list_category.id),  # convert UUID to string
+                "items": new_list_of_items,
             }
         except ShoppingListCategory.DoesNotExist:
             print("selected shopping list is deleted")
