@@ -1,17 +1,70 @@
 from django.db import models
-from django.contrib.auth.models import User
+from apps.user_auth.models import RecipeJarUser
+from apps.main.models import BaseModel
 
 
-
-
-class RecipeJarUser(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    date_of_birth = models.DateField(null=True)
-    phone_number = models.CharField(max_length=100, null=True)
-    weight = models.FloatField(null=True)
-    height = models.FloatField(null=True)
-    selected_shopping_list = models.CharField(max_length=150, null=True)
+class RecipeCategory(BaseModel):
+    user = models.ForeignKey(
+        RecipeJarUser,
+        on_delete=models.CASCADE,
+        related_name='recipeCategories'
+    )
+    name = models.CharField(
+        max_length=255
+    )
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name}"
+        return self.name
 
+
+class Recipe(BaseModel):
+    recipe_category = models.ForeignKey(
+        RecipeCategory,
+        on_delete=models.CASCADE,
+        related_name='recipes'
+    )
+    title = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True
+    )
+    time = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
+    picture_url = models.URLField(
+        max_length=500,
+        null=True,
+        blank=True
+    )
+    video_url = models.URLField(
+        max_length=500,
+        null=True,
+        blank=True
+    )
+    video_image_url = models.URLField(
+        max_length=500,
+        null=True,
+        blank=True
+    )
+    video_title = models.CharField(
+        max_length=500,
+        null=True,
+        blank=True
+    )
+    video_duration = models.TimeField(
+        null=True,
+        blank=True
+    )
+    video_channel_name = models.CharField(
+        max_length=500,
+        null=True,
+        blank=True
+    )
+    video_posted_date = models.DateTimeField(
+        null=True,
+        blank=True
+    )
+    is_editor_choice = models.BooleanField(
+        default=False
+    )

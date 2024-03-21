@@ -1,5 +1,5 @@
-drinks/__pycache__/
-drinks/migrations/
+config/__pycache__/
+config/migrations/
 error.log
 output.log
 secrets.py
