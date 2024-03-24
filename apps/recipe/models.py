@@ -1,6 +1,7 @@
 from django.db import models
-from apps.user_auth.models import RecipeJarUser
 from apps.main.models import BaseModel
+from apps.user_auth.models import RecipeJarUser
+from apps.shopping_list.models import Items
 
 
 class RecipeCategory(BaseModel):
@@ -12,6 +13,10 @@ class RecipeCategory(BaseModel):
     name = models.CharField(
         max_length=255
     )
+    order_number = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
 
     def __str__(self):
         return self.name
@@ -20,8 +25,10 @@ class RecipeCategory(BaseModel):
 class Recipe(BaseModel):
     recipe_category = models.ForeignKey(
         RecipeCategory,
-        on_delete=models.CASCADE,
-        related_name='recipes'
+        on_delete=models.SET_NULL,
+        related_name='recipes',
+        null=True,
+        blank=True
     )
     title = models.CharField(
         max_length=100,
@@ -68,3 +75,66 @@ class Recipe(BaseModel):
     is_editor_choice = models.BooleanField(
         default=False
     )
+    order_number = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.title
+
+
+class Steps(BaseModel):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='steps'
+    )
+    description = models.TextField(
+        null=True,
+        blank=True
+    )
+    order_number = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return self.description
+
+
+class Ingredients(BaseModel):
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='ingredients_recipe'
+    )
+    items = models.ForeignKey(
+        Items,
+        on_delete=models.CASCADE,
+        related_name='ingredient_items'
+    )
+    name = models.CharField(
+        max_length=500,
+        null=True,
+        blank=True
+    )
+    quantity = models.FloatField(
+        null=True,
+        blank=True
+    )
+    unit = models.CharField(
+        max_length=500,
+        null=True,
+        blank=True
+    )
+    order_number = models.PositiveIntegerField(
+        null=True,
+        blank=True
+    )
+
+    def __str__(self):
+        return f"{self.name} {self.quantity} {self.unit}"
+
+
+

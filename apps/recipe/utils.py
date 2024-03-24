@@ -1,50 +1,28 @@
-import re
-from fractions import Fraction
+from quantulum3 import parser
 
 
 def parse_quantity_and_unit(ingredient):
     quantity = None
     unit = None
 
-    # Updated regex pattern to match quantity and unit
-    pattern = r'(?:(\d*\.?\d+)\s*(?:\/\s*(\d+))?\s*)(\w*)'
-    match = re.search(pattern, ingredient)
-    if match:
-        quantity_whole_part = match.group(1)
-        quantity_fraction_part = match.group(2)
-        unit = match.group(3)
-        # Construct quantity from whole part and fraction part
-        if quantity_whole_part:
-            quantity = float(quantity_whole_part)
-            if quantity_fraction_part:
-                quantity += float(Fraction('0.' + quantity_fraction_part))
+    # Parse the ingredient using quantulum3 parser
+    quantities = parser.parse(ingredient)
+
+    # Extract quantity and unit from the parsed result
+    if quantities:
+        quantity = quantities[0].value
+        unit = quantities[0].unit.name
+
     return quantity, unit
 
 
 def extract_ingredient_name(ingredient):
-    # Updated regex pattern to extract ingredient name
-    pattern = r'^\s*(?:\d*\.?\d*\s*(?:\/\s*\d+)?\s*\w*)?\s*(.*)$'
-    match = re.search(pattern, ingredient)
-    if match:
-        ingredient_name = match.group(1).strip()
-        if ingredient_name:
-            return ingredient_name
-        # If no quantity or unit, return the entire ingredient as the name
-        return ingredient.strip()
+    # Parse the ingredient using quantulum3 parser
+    quantities = parser.parse(ingredient)
 
+    # If quantities are found, remove them from the ingredient string
+    if quantities:
+        ingredient = ingredient.replace(quantities[0].surface, '')
 
-def fraction_to_decimal(match):
-    # Convert fraction to decimal
-    fraction_str = match.group(1)
-    try:
-        return str(float(Fraction(fraction_str)))
-    except ValueError:
-        return fraction_str
-
-
-def convert_recipe_fraction(ingredient):
-    # Replace fractions with decimal values
-    fraction_pattern = r'(\d*\.?\d+\/\d+)'
-    replaced = re.sub(fraction_pattern, fraction_to_decimal, ingredient)
-
-    return replaced
+    # Remove leading and trailing whitespace and return the remaining text as the ingredient name
+    return ingredient.strip()

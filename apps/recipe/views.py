@@ -5,7 +5,8 @@ from rest_framework.generics import (
 )
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.views import APIView
+from rest_framework.viewsets import ViewSet
+from rest_framework.decorators import action
 from recipe_scrapers import scrape_me
 from quantulum3 import parser
 from apps.recipe.models import RecipeCategory
@@ -13,26 +14,24 @@ from apps.recipe.serializer import RecipeSerializer
 from apps.user_auth.models import RecipeJarUser
 from apps.recipe.utils import (
     parse_quantity_and_unit,
-    extract_ingredient_name,
-    convert_recipe_fraction
+    extract_ingredient_name
 )
 
 
-class RecipeInformation(APIView):
+class RecipeInformation(ViewSet):
     """
     Get recipe information from a web extension and save it to the database
     """
     serializer_class = RecipeSerializer
-    queryset = RecipeCategory.objects.none()
 
-    def post(self, request, *args, **kwargs):
+    @action(methods=['post'], detail=False, url_path='get-recipe-category')
+    def post(self, request, *args, **kwargs) -> Response:
         data = request.data
-        web_url = data.get('website_url')
         user_apple_id = data.get('user_apple_id')
 
-        if not web_url or not user_apple_id:
+        if not user_apple_id:
             return Response(
-                {'error': 'Both website_url and user_id are required.'},
+                {'error': 'user_id are required.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
@@ -43,12 +42,22 @@ class RecipeInformation(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         categories = RecipeCategory.objects.filter(user=user).order_by('-id')
+        response_data = {
+            'categories': self.serializer_class(categories, many=True).data
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def list(self, request, *args, **kwargs) -> Response:
+        data = request.data
+        web_url = data.get('website_url')
+
         scraper = scrape_me(web_url)
 
         ingredients = []
         steps = []
+        nutrients = {}
 
-        for ingredient in scraper.ingredients():
+        for index, ingredient in enumerate(scraper.ingredients()):
             quantity, unit = parse_quantity_and_unit(ingredient)
             ingredient_name = extract_ingredient_name(ingredient)
 
@@ -56,23 +65,30 @@ class RecipeInformation(APIView):
                 'name': ingredient_name if ingredient_name else "There is no name",
                 'quantity': quantity,
                 'unit': unit,
+                'order_number': index + 1,
             })
 
-        for step in scraper.instructions_list():
+        for index, step in enumerate(scraper.instructions_list()):
             steps.append({
                 'step': step,
+                'order_number': index + 1,
             })
 
+        for name, value in scraper.nutrients().items():
+            nutrients[name] = value
+
         recipe = {
-            'name': scraper.title(),
+            'author': scraper.author(),
+            'title': scraper.title(),
+            'recipe_category': scraper.category(),
             'picture_url': scraper.image(),
             'ingredients': ingredients,
             'steps': steps,
+            'nutrients': nutrients,
+            'rating': scraper.ratings(),
         }
-
         response_data = {
             'recipe': recipe,
-            'categories': self.serializer_class(categories, many=True).data
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
@@ -81,50 +97,4 @@ class SaveRecipe(CreateAPIView):
     """
     Save recipe to the database
     """
-    serializer_class = RecipeSerializer
-
-    def post(self, request, *args, **kwargs):
-        data = request.data
-        user_apple_id = data.get('user_apple_id')
-        recipe_data = data.get('recipe')
-        category_id = data.get('category_id')
-
-        if not user_apple_id or not recipe_data or not category_id:
-            return Response(
-                {'error': 'user_apple_id, recipe and category_id are required.'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-
-        try:
-            user = RecipeJarUser.objects.get(random_apple_id=user_apple_id)
-        except RecipeJarUser.DoesNotExist:
-            return Response(
-                {'error': 'User not found.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        try:
-            category = RecipeCategory.objects.get(id=category_id)
-        except RecipeCategory.DoesNotExist:
-            return Response(
-                {'error': 'Category not found.'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        recipe_data['user'] = user.id
-        recipe_data['category'] = category.id
-
-        ingredients = recipe_data.get('ingredients')
-        steps = recipe_data.get('steps')
-
-        for ingredient in ingredients:
-            ingredient['quantity'] = convert_recipe_fraction(ingredient.get('quantity'))
-
-        for step in steps:
-            step['description'] = convert_recipe_fraction(step.get('description'))
-
-        serializer = self.serializer_class(data=recipe_data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    pass
