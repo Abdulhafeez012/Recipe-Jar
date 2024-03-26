@@ -6,11 +6,11 @@ from apps.recipe import views
 from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
-router.register(r'get-recipe-information', views.RecipeInformation, basename='get_recipe_information')
+router.register(r'web-extension', views.WebExtensionAPI, basename='get_recipe_information'),
+router.register(r'recipe-category', views.RecipeCategoryAPI, basename='save_recipe_category'),
 
 urlpatterns = [
-    path('web-extension/', include(router.urls)),
-    path('web-extension/save-recipe/', views.SaveRecipe.as_view(), name='save_recipe'),
+    path('', include(router.urls)),
 ]
 
 
