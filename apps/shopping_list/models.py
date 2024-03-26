@@ -3,7 +3,7 @@ from apps.main.models import BaseModel
 from apps.user_auth.models import RecipeJarUser
 
 
-class ShoppingListCategories(BaseModel):
+class ShoppingListCategory(BaseModel):
     user = models.ForeignKey(
         RecipeJarUser,
         on_delete=models.CASCADE,
@@ -24,11 +24,16 @@ class ShoppingListCategories(BaseModel):
         return self.name
 
 
-class ShoppingListItem(BaseModel):
+class ShoppingList(BaseModel):
     shopping_list_category = models.ForeignKey(
-        ShoppingListCategories,
+        ShoppingListCategory,
         on_delete=models.CASCADE,
-        related_name='shopping_list_items'
+        related_name='shopping_list'
+    )
+    is_check = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True
     )
     order_number = models.PositiveIntegerField(
         null=True,
@@ -40,18 +45,22 @@ class ShoppingListItem(BaseModel):
 
 
 class Items(BaseModel):
-    shopping_list_item = models.ForeignKey(
-        ShoppingListItem,
-        on_delete=models.CASCADE,
-        related_name='items'
-    )
     name = models.CharField(
         max_length=255
-    )
-    order_number = models.PositiveIntegerField(
-        null=True,
-        blank=True
     )
 
     def __str__(self):
         return f"{self.name} - {self.order_number}"
+
+
+class ShoppingListItems(BaseModel):
+    shopping_list = models.ForeignKey(
+        ShoppingList,
+        on_delete=models.CASCADE,
+        related_name='shopping_list_items'
+    )
+    item = models.ForeignKey(
+        Items,
+        on_delete=models.CASCADE,
+        related_name='items'
+    )

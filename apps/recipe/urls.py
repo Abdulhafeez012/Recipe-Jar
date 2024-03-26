@@ -10,7 +10,7 @@ router.register(r'get-recipe-information', views.RecipeInformation, basename='ge
 
 urlpatterns = [
     path('web-extension/', include(router.urls)),
-    path('web-extension/recipe/', views.SaveRecipe.as_view(), name='save_recipe'),
+    path('web-extension/save-recipe/', views.SaveRecipe.as_view(), name='save_recipe'),
 ]
 
 

@@ -4,8 +4,15 @@ from apps.main.models import BaseModel
 
 
 class RecipeJarUser(BaseModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    date_of_birth = models.DateField(null=True)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='recipe_user'
+    )
+    date_of_birth = models.DateField(
+        null=True,
+        blank=True
+    )
     phone_number = models.CharField(max_length=100, null=True)
     weight = models.FloatField(null=True)
     height = models.FloatField(null=True)

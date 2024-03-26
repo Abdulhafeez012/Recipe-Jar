@@ -1023,7 +1023,7 @@
 #
 #     # Return an error response if the request method is not POST
 #     return JsonResponse({'error': 'this API is POST API'}, status=405)
-#
+
 #
 # # this api used in save_recipe api to get the video from you-tube that have max number of views
 # def get_video(query):

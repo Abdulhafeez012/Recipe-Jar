@@ -84,7 +84,7 @@ class Recipe(BaseModel):
         return self.title
 
 
-class Steps(BaseModel):
+class RecipeStep(BaseModel):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -103,7 +103,7 @@ class Steps(BaseModel):
         return self.description
 
 
-class Ingredients(BaseModel):
+class RecipeIngredient(BaseModel):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
@@ -113,11 +113,6 @@ class Ingredients(BaseModel):
         Items,
         on_delete=models.CASCADE,
         related_name='ingredient_items'
-    )
-    name = models.CharField(
-        max_length=500,
-        null=True,
-        blank=True
     )
     quantity = models.FloatField(
         null=True,
