@@ -10,23 +10,39 @@ from apps.recipe.models import (
 class RecipeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recipe
-        fields = '__all__'
+        exclude = ('created_at', 'updated_at')
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['recipe_category'] = instance.recipe_category.name
+        return data
 
 
 class RecipeCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeCategory
-        fields = '__all__'
+        exclude = ('created_at', 'updated_at')
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeIngredient
-        fields = '__all__'
+        exclude = ('created_at', 'updated_at')
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['items'] = instance.items.name
+        data['recipe'] = instance.recipe.title
+        return data
 
 
 class RecipeStepSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeStep
-        fields = '__all__'
+        exclude = ('created_at', 'updated_at')
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data['recipe'] = instance.recipe.title
+        return data
 
