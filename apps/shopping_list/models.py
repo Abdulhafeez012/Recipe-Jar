@@ -30,11 +30,6 @@ class ShoppingList(BaseModel):
         on_delete=models.CASCADE,
         related_name='shopping_list'
     )
-    is_check = models.BooleanField(
-        default=False,
-        null=True,
-        blank=True
-    )
     order_number = models.PositiveIntegerField(
         null=True,
         blank=True
@@ -47,6 +42,11 @@ class ShoppingList(BaseModel):
 class Items(BaseModel):
     name = models.CharField(
         max_length=255
+    )
+    is_check = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True
     )
 
     def __str__(self):

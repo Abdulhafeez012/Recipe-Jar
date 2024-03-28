@@ -1,4 +1,5 @@
 from django.db import transaction
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.decorators import action
@@ -15,14 +16,6 @@ from apps.shopping_list.models import (
     Items,
     ShoppingListCategory,
     ShoppingListItems,
-)
-from django.shortcuts import (
-    render,
-    get_object_or_404
-)
-from rest_framework.generics import (
-    CreateAPIView,
-    ListCreateAPIView,
 )
 from rest_framework import (
     status,
@@ -238,7 +231,10 @@ class RecipeCategoryAPI(ViewSet):
         )
         last_category_order_number = RecipeCategory.objects.filter(
             user=user
-        ).order_by('-order_number').values_list('order_number', flat=True).first() or 0
+        ).order_by('-order_number').values_list(
+            'order_number',
+            flat=True
+        ).first() or 0
 
         RecipeCategory.objects.get_or_create(
             user=user,
@@ -255,7 +251,7 @@ class RecipeCategoryAPI(ViewSet):
         )
 
     @action(methods=['get'], detail=False, url_path='get-recipe-category')
-    def get(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs) -> Response:
         data = request.data
         user_apple_id = data.get('user_apple_id')
         user = get_object_or_404(
@@ -269,7 +265,7 @@ class RecipeCategoryAPI(ViewSet):
         )
 
     @action(methods=['delete'], detail=False, url_path='delete-recipe-category')
-    def delete(self, request, *args, **kwargs):
+    def delete(self, request, *args, **kwargs) -> Response:
         data = request.data
         category_id = data.get('category_id')
 
