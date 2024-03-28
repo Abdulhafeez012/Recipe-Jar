@@ -50,7 +50,7 @@ class Items(BaseModel):
     )
 
     def __str__(self):
-        return f"{self.name} - {self.order_number}"
+        return f"{self.name} - {self.is_check}"
 
 
 class ShoppingListItems(BaseModel):

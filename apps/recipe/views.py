@@ -37,7 +37,7 @@ class WebExtensionAPI(ViewSet):
     """
     Web extension endpoints
     """
-    serializer_class = RecipeSerializer
+    serializer_class = RecipeCategorySerializer
     permissions_classes = [permissions.IsAuthenticated]
 
     @action(methods=['get'], detail=False, url_path='recipe-information')
