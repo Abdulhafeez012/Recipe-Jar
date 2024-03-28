@@ -119,12 +119,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # if DEVELOPMENT_MODE is True:
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME", "recipe_db"),
-        "USER": os.getenv("DB_USER", "recipe@oth_ezo"),
-        "PASSWORD": os.getenv("DB_PASSWORD", "recipe$123"),
-        "HOST": "localhost",
-        "PORT": '3306',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
