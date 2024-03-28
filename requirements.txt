@@ -58,7 +58,7 @@ pyRdfa3==3.5.3
 pytz==2023.3.post1
 quantulum3==0.9.0
 rdflib==7.0.0
-recipe-scrapers==14.53.0
+recipe-scrapers==14.55.0
 requests==2.31.0
 rsa==4.9
 six==1.16.0
@@ -80,3 +80,8 @@ w3lib==2.1.2
 wasabi==1.1.2
 weasel==0.3.4
 webencodings==0.5.1
+measurement==4.0a8
+mysqlclient==2.2.4
+mysql==0.0.3
+python-dotenv==1.0.1
+
