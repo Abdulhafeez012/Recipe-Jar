@@ -33,10 +33,9 @@ class ShoppingListCategorySerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response['user'] = {
             "id": instance.user.id,
-            "name": instance.user.name,
             "apple_id": instance.user.user_apple_id,
         }
-        respone['name'] = instance.name
+        response['name'] = instance.name
         response['icon'] = instance.icon
         response['order_number'] = instance.order_number
         return response
