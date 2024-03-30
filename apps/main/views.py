@@ -32,7 +32,7 @@ class HomeViewAPI(ViewSet):
         """
         Get all shopping list categories
         """
-        data = request.data
+        data = request.GET
         user_apple_id = data.get('user_apple_id')
         shopping_list_category_id = data.get('shopping_list_category_id')
 

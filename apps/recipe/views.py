@@ -42,7 +42,7 @@ class WebExtensionAPI(ViewSet):
 
     @action(methods=['get'], detail=False, url_path='recipe-information')
     def get(self, request, *args, **kwargs) -> Response:
-        data = request.data
+        data = request.GET
         web_url = data.get('website_url')
         user_apple_id = data.get('user_apple_id')
         if not user_apple_id:
@@ -252,7 +252,7 @@ class RecipeCategoryAPI(ViewSet):
 
     @action(methods=['get'], detail=False, url_path='get-all-recipe-categories')
     def get(self, request, *args, **kwargs) -> Response:
-        data = request.data
+        data = request.GET
         user_apple_id = data.get('user_apple_id')
         user = get_object_or_404(
             RecipeJarUser,
@@ -310,7 +310,7 @@ class RecipeAPI(ViewSet):
 
     @action(methods=['get'], detail=False, url_path='get-recipe')
     def get_recipe(self, request, *args, **kwargs) -> Response:
-        data = request.data
+        data = request.GET
 
         user_apple_id = data.get('user_apple_id')
         category_id = data.get('category_id')
@@ -334,7 +334,7 @@ class RecipeAPI(ViewSet):
 
     @action(methods=['get'], detail=False, url_path='get-recipe-ingredient')
     def get_ingredient(self, request, *args, **kwargs) -> Response:
-        date = request.data
+        date = request.GET
         recipe_id = date.get('recipe_id')
         recipe = get_object_or_404(
             Recipe,
@@ -349,7 +349,7 @@ class RecipeAPI(ViewSet):
 
     @action(methods=['get'], detail=False, url_path='get-recipe-step')
     def get_step(self, request, *args, **kwargs) -> Response:
-        date = request.data
+        date = request.GET
         recipe_id = date.get('recipe_id')
         recipe = get_object_or_404(
             Recipe,

@@ -30,7 +30,7 @@ class ShoppingListCategoryAPI(ViewSet):
         """
         Get all shopping list categories
         """
-        data = request.data
+        data = request.GET
         user_apple_id = data.get('user_apple_id')
         shopping_list_categories = ShoppingListCategory.objects.filter(
             user__user_apple_id=user_apple_id
@@ -143,7 +143,7 @@ class ShoppingListAPI(ViewSet):
         """
         Get all shopping list items
         """
-        data = request.data
+        data = request.GET
         shopping_list_category_id = data.get('shopping_list_category_id')
 
         shopping_list = get_object_or_404(
