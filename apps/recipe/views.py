@@ -250,7 +250,7 @@ class RecipeCategoryAPI(ViewSet):
             status=status.HTTP_201_CREATED
         )
 
-    @action(methods=['get'], detail=False, url_path='get-recipe-category')
+    @action(methods=['get'], detail=False, url_path='get-all-recipe-categories')
     def get(self, request, *args, **kwargs) -> Response:
         data = request.data
         user_apple_id = data.get('user_apple_id')
