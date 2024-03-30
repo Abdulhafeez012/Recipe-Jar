@@ -9,13 +9,11 @@ from rest_framework import (
     permissions
 )
 from apps.shopping_list.models import (
-    ShoppingList,
     ShoppingListCategory,
     ShoppingListItems,
     Items
 )
 from apps.shopping_list.serializer import (
-    ShoppingListSerializer,
     ShoppingListCategorySerializer,
     ShoppingListItemsSerializer,
     ItemsSerializer
@@ -52,7 +50,7 @@ class HomeViewAPI(ViewSet):
             'id'
         )
         return Response(
-            {'data': self.serializer_class(shopping_list_items, many=True).data,},
+            self.serializer_class(shopping_list_items, many=True).data,
             status=status.HTTP_200_OK
         )
 

@@ -8,13 +8,11 @@ from rest_framework import (
     permissions
 )
 from apps.shopping_list.models import (
-    ShoppingList,
     ShoppingListCategory,
     ShoppingListItems,
     Items
 )
 from apps.shopping_list.serializer import (
-    ShoppingListSerializer,
     ShoppingListCategorySerializer,
     ShoppingListItemsSerializer
 )
@@ -40,7 +38,7 @@ class ShoppingListCategoryAPI(ViewSet):
             'order_number'
         )
         return Response(
-            {'data': self.serializer_class(shopping_list_categories, many=True).data},
+            self.serializer_class(shopping_list_categories, many=True).data,
             status=status.HTTP_200_OK
         )
 
@@ -74,7 +72,7 @@ class ShoppingListCategoryAPI(ViewSet):
             order_number=last_order_number + 1
         )
         return Response(
-            {'data': self.serializer_class(shopping_list_category).data},
+            self.serializer_class(shopping_list_category).data,
             status=status.HTTP_201_CREATED
         )
 
@@ -104,7 +102,7 @@ class ShoppingListCategoryAPI(ViewSet):
             shopping_list_category.name = name
         shopping_list_category.save()
         return Response(
-            {'data': self.serializer_class(shopping_list_category).data},
+            self.serializer_class(shopping_list_category).data,
             status=status.HTTP_200_OK
         )
 
@@ -137,7 +135,6 @@ class ShoppingListAPI(ViewSet):
     """
     Shopping List APIs
     """
-    shopping_list_serializer_class = ShoppingListSerializer
     shopping_list_items_serializer_class = ShoppingListItemsSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -158,7 +155,7 @@ class ShoppingListAPI(ViewSet):
         )
 
         return Response(
-            {'data': self.shopping_list_items_serializer_class(shopping_list_items, many=True).data},
+            self.shopping_list_items_serializer_class(shopping_list_items, many=True).data,
             status=status.HTTP_200_OK
         )
 
@@ -171,20 +168,20 @@ class ShoppingListAPI(ViewSet):
         shopping_list_category_id = data.get('shopping_list_category_id')
         item_id = data.get('item')
 
-        shopping_list = get_object_or_404(
-            ShoppingList,
-            shopping_list_category__id=shopping_list_category_id
+        shopping_list_category = get_object_or_404(
+            ShoppingListCategory,
+            id=shopping_list_category_id
         )
         item = Items.objects.filter(
             id=item_id
         ).get()
         shopping_list_items = ShoppingListItems.objects.create(
-                shopping_list=shopping_list,
+                shopping_list_category=shopping_list_category,
                 item=item
             )
 
         return Response(
-            {'data': self.shopping_list_items_serializer_class(shopping_list_items).data},
+            self.shopping_list_items_serializer_class(shopping_list_items).data,
             status=status.HTTP_201_CREATED
         )
 
