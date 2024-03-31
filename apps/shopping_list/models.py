@@ -7,7 +7,7 @@ class ShoppingListCategory(BaseModel):
     user = models.ForeignKey(
         RecipeJarUser,
         on_delete=models.CASCADE,
-        related_name='shoppingLists'
+        related_name='shopping_list_category'
     )
     name = models.CharField(
         max_length=255

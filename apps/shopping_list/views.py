@@ -3,6 +3,7 @@ from rest_framework.viewsets import ViewSet
 from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from apps.user_auth.models import RecipeJarUser
+from django.db.models import Max
 from rest_framework import (
     status,
     permissions
@@ -52,23 +53,22 @@ class ShoppingListCategoryAPI(ViewSet):
         name = data.get('name')
         icon = data.get('icon')
 
+        icon_ascii = ord(icon) if icon else None
+        # Get the user and annotate it with the maximum order number of its shopping list categories
         user = get_object_or_404(
-            RecipeJarUser,
+            RecipeJarUser.objects.annotate(
+                max_order_number=Max('shopping_list_category__order_number')
+            ),
             user_apple_id=user_apple_id
         )
-        last_order_number = ShoppingListCategory.objects.filter(
-            user=user
-        ).order_by(
-            '-order_number'
-        ).values_list(
-            'order_number',
-            flat=True
-        ).first() or 0
+
+        # If the user has no shopping list categories, max_order_number will be None, so we default it to 0
+        last_order_number = user.max_order_number or 0
 
         shopping_list_category = ShoppingListCategory.objects.create(
             user=user,
             name=name,
-            icon=icon,
+            icon=icon_ascii,
             order_number=last_order_number + 1
         )
         return Response(
@@ -87,17 +87,14 @@ class ShoppingListCategoryAPI(ViewSet):
         icon = data.get('icon')
         shopping_list_category_id = data.get('shopping_list_category_id')
 
-        user = get_object_or_404(
-            RecipeJarUser,
-            user_apple_id=user_apple_id
-        )
         shopping_list_category = get_object_or_404(
-            ShoppingListCategory,
-            user=user,
+            ShoppingListCategory.objects.select_related('user'),
+            user__user_apple_id=user_apple_id,
             id=shopping_list_category_id
         )
         if icon:
-            shopping_list_category.icon = icon
+            icon_ascii = ord(icon)
+            shopping_list_category.icon = icon_ascii
         if name:
             shopping_list_category.name = name
         shopping_list_category.save()
@@ -115,13 +112,8 @@ class ShoppingListCategoryAPI(ViewSet):
         user_apple_id = data.get('user_apple_id')
         shopping_list_category_id = data.get('shopping_list_category_id')
 
-        user = get_object_or_404(
-            RecipeJarUser,
-            user_apple_id=user_apple_id
-        )
-        shopping_list_category = get_object_or_404(
-            ShoppingListCategory,
-            user=user,
+        shopping_list_category = ShoppingListCategory.objects.select_related('user').get(
+            user__user_apple_id=user_apple_id,
             id=shopping_list_category_id
         )
         shopping_list_category.delete()
@@ -176,9 +168,9 @@ class ShoppingListAPI(ViewSet):
             id=item_id
         ).get()
         shopping_list_items = ShoppingListItems.objects.create(
-                shopping_list_category=shopping_list_category,
-                item=item
-            )
+            shopping_list_category=shopping_list_category,
+            item=item
+        )
 
         return Response(
             self.shopping_list_items_serializer_class(shopping_list_items).data,
@@ -242,5 +234,3 @@ class ShoppingListAPI(ViewSet):
             {'message': 'Shopping list item deleted successfully'},
             status=status.HTTP_204_NO_CONTENT
         )
-
-
