@@ -148,7 +148,7 @@ class ShoppingListAPI(ViewSet):
 
         shopping_list_category = get_object_or_404(
             ShoppingListCategory,
-            shopping_list_category__id=shopping_list_category_id
+            id=shopping_list_category_id
         )
         shopping_list_items = ShoppingListItems.objects.filter(
             shopping_list_category=shopping_list_category
@@ -196,7 +196,7 @@ class ShoppingListAPI(ViewSet):
 
         shopping_list_category = get_object_or_404(
             ShoppingListCategory,
-            shopping_list_category__id=shopping_list_category_id
+            id=shopping_list_category_id
         )
         for item in items:
             shopping_list_item = get_object_or_404(
@@ -225,7 +225,7 @@ class ShoppingListAPI(ViewSet):
 
         shopping_list_category = get_object_or_404(
             ShoppingListCategory,
-            shopping_list_category__id=shopping_list_category_id
+            id=shopping_list_category_id
         )
         item = get_object_or_404(
             Items,
