@@ -54,79 +54,97 @@ class ShoppingListCategoryAPI(ViewSet):
         """
         Create a shopping list category
         """
-        data = request.data
-        user_apple_id = data.get('user_apple_id')
-        name = data.get('name')
-        icon = data.get('icon')
+        try:
+            data = request.data
+            user_apple_id = data.get('user_apple_id')
+            name = data.get('name')
+            icon = data.get('icon')
 
-        icon_ascii = ord(icon) if icon else None
-        # Get the user and annotate it with the maximum order number of its shopping list categories
-        user = get_object_or_404(
-            RecipeJarUser.objects.annotate(
-                max_order_number=Max('shopping_list_category__order_number')
-            ),
-            user_apple_id=user_apple_id
-        )
+            icon_ascii = ord(icon) if icon else None
+            # Get the user and annotate it with the maximum order number of its shopping list categories
+            user = get_object_or_404(
+                RecipeJarUser.objects.annotate(
+                    max_order_number=Max('shopping_list_category__order_number')
+                ),
+                user_apple_id=user_apple_id
+            )
 
-        # If the user has no shopping list categories, max_order_number will be None, so we default it to 0
-        last_order_number = user.max_order_number or 0
+            # If the user has no shopping list categories, max_order_number will be None, so we default it to 0
+            last_order_number = user.max_order_number or 0
 
-        shopping_list_category = ShoppingListCategory.objects.create(
-            user=user,
-            name=name,
-            icon=icon_ascii,
-            order_number=last_order_number + 1
-        )
-        return Response(
-            self.serializer_class(shopping_list_category).data,
-            status=status.HTTP_201_CREATED
-        )
+            shopping_list_category = ShoppingListCategory.objects.create(
+                user=user,
+                name=name,
+                icon=icon_ascii,
+                order_number=last_order_number + 1
+            )
+            return Response(
+                self.serializer_class(shopping_list_category).data,
+                status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response(
+                {'message': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(methods=['put'], detail=False, url_path='update')
     def update_shopping_list_category(self, request, *args, **kwargs) -> Response:
         """
         Update a shopping list category
         """
-        data = request.data
-        user_apple_id = data.get('user_apple_id')
-        name = data.get('name')
-        icon = data.get('icon')
-        shopping_list_category_id = data.get('shopping_list_category_id')
+        try:
+            data = request.data
+            user_apple_id = data.get('user_apple_id')
+            name = data.get('name')
+            icon = data.get('icon')
+            shopping_list_category_id = data.get('shopping_list_category_id')
 
-        shopping_list_category = get_object_or_404(
-            ShoppingListCategory.objects.select_related('user'),
-            user__user_apple_id=user_apple_id,
-            id=shopping_list_category_id
-        )
-        if icon:
-            icon_ascii = ord(icon)
-            shopping_list_category.icon = icon_ascii
-        if name:
-            shopping_list_category.name = name
-        shopping_list_category.save()
-        return Response(
-            self.serializer_class(shopping_list_category).data,
-            status=status.HTTP_200_OK
-        )
+            shopping_list_category = get_object_or_404(
+                ShoppingListCategory.objects.select_related('user'),
+                user__user_apple_id=user_apple_id,
+                id=shopping_list_category_id
+            )
+            if icon:
+                icon_ascii = ord(icon)
+                shopping_list_category.icon = icon_ascii
+            if name:
+                shopping_list_category.name = name
+            shopping_list_category.save()
+            return Response(
+                self.serializer_class(shopping_list_category).data,
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {'message': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(methods=['delete'], detail=False, url_path='delete')
     def delete(self, request, *args, **kwargs) -> Response:
         """
         Delete a shopping list category
         """
-        data = request.data
-        user_apple_id = data.get('user_apple_id')
-        shopping_list_category_id = data.get('shopping_list_category_id')
+        try:
+            data = request.data
+            user_apple_id = data.get('user_apple_id')
+            shopping_list_category_id = data.get('shopping_list_category_id')
 
-        shopping_list_category = ShoppingListCategory.objects.select_related('user').get(
-            user__user_apple_id=user_apple_id,
-            id=shopping_list_category_id
-        )
-        shopping_list_category.delete()
-        return Response(
-            {'message': 'Shopping list category deleted successfully'},
-            status=status.HTTP_204_NO_CONTENT
-        )
+            shopping_list_category = ShoppingListCategory.objects.select_related('user').get(
+                user__user_apple_id=user_apple_id,
+                id=shopping_list_category_id
+            )
+            shopping_list_category.delete()
+            return Response(
+                {'message': 'Shopping list category deleted successfully'},
+                status=status.HTTP_204_NO_CONTENT
+            )
+        except Exception as e:
+            return Response(
+                {'message': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
 
 class ShoppingListAPI(ViewSet):
