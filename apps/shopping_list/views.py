@@ -31,17 +31,23 @@ class ShoppingListCategoryAPI(ViewSet):
         """
         Get all shopping list categories
         """
-        data = request.GET
-        user_apple_id = data.get('user_apple_id')
-        shopping_list_categories = ShoppingListCategory.objects.filter(
-            user__user_apple_id=user_apple_id
-        ).order_by(
-            'order_number'
-        )
-        return Response(
-            self.serializer_class(shopping_list_categories, many=True).data,
-            status=status.HTTP_200_OK
-        )
+        try:
+            data = request.GET
+            user_apple_id = data.get('user_apple_id')
+            shopping_list_categories = ShoppingListCategory.objects.filter(
+                user__user_apple_id=user_apple_id
+            ).order_by(
+                'order_number'
+            )
+            return Response(
+                self.serializer_class(shopping_list_categories, many=True).data,
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response(
+                {'message': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(methods=['post'], detail=False, url_path='create')
     def create_shopping_list_category(self, request, *args, **kwargs) -> Response:
