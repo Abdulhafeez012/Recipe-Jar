@@ -146,12 +146,12 @@ class ShoppingListAPI(ViewSet):
         data = request.GET
         shopping_list_category_id = data.get('shopping_list_category_id')
 
-        shopping_list = get_object_or_404(
-            ShoppingList,
+        shopping_list_category = get_object_or_404(
+            ShoppingListCategory,
             shopping_list_category__id=shopping_list_category_id
         )
         shopping_list_items = ShoppingListItems.objects.filter(
-            shopping_list=shopping_list
+            shopping_list_category=shopping_list_category
         )
 
         return Response(
@@ -194,14 +194,14 @@ class ShoppingListAPI(ViewSet):
         shopping_list_category_id = data.get('shopping_list_category_id')
         items = data.get('items')
 
-        shopping_list = get_object_or_404(
-            ShoppingList,
+        shopping_list_category = get_object_or_404(
+            ShoppingListCategory,
             shopping_list_category__id=shopping_list_category_id
         )
         for item in items:
             shopping_list_item = get_object_or_404(
                 ShoppingListItems,
-                shopping_list=shopping_list,
+                shopping_list_category=shopping_list_category,
                 item__id=item
             )
             if shopping_list_item.item.is_check:
@@ -223,8 +223,8 @@ class ShoppingListAPI(ViewSet):
         shopping_list_category_id = data.get('shopping_list_category_id')
         item_id = data.get('item_id')
 
-        shopping_list = get_object_or_404(
-            ShoppingList,
+        shopping_list_category = get_object_or_404(
+            ShoppingListCategory,
             shopping_list_category__id=shopping_list_category_id
         )
         item = get_object_or_404(
@@ -233,7 +233,7 @@ class ShoppingListAPI(ViewSet):
         )
         shopping_list_item = get_object_or_404(
             ShoppingListItems,
-            shopping_list=shopping_list,
+            shopping_list_category=shopping_list_category,
             item=item
         )
         shopping_list_item.delete()
