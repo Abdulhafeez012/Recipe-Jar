@@ -42,7 +42,7 @@ class HomeViewAPI(ViewSet):
         )
         shopping_list_category = get_object_or_404(
             ShoppingListCategory,
-            shopping_list__shopping_list_category__id=shopping_list_category_id
+            id=shopping_list_category_id
         )
         shopping_list_items = ShoppingListItems.objects.filter(
             shopping_list__shopping_list_category=shopping_list_category
