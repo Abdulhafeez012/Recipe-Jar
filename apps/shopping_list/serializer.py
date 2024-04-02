@@ -27,16 +27,12 @@ class ShoppingListItemsSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        response['shopping_list_category'] = {
-            "id": instance.shopping_list_category.id,
-            "name": instance.shopping_list_category.name,
-            "order_number": instance.shopping_list_category.order_number,
-        }
-        response['item'] = {
-            "id": instance.item.id,
-            "name": instance.item.name,
-            "is_check": instance.item.is_check,
-        }
+        response.pop('shopping_list_category', None)
+        response.pop('id', None)
+        response.pop('item', None)
+        response["id"] = instance.item.id
+        response["name"] = instance.item.name
+        response["is_check"] = instance.item.is_check
         return response
 
 
