@@ -182,15 +182,16 @@ class ShoppingListAPI(ViewSet):
         """
         data = request.data
         shopping_list_category_id = data.get('shopping_list_category_id')
-        item_id = data.get('item')
+        itme_name = data.get('item_name')
 
         shopping_list_category = get_object_or_404(
             ShoppingListCategory,
             id=shopping_list_category_id
         )
-        item = Items.objects.filter(
-            id=item_id
-        ).get()
+        item = Items.objects.create(
+            name=itme_name,
+            is_check=False
+        )
         shopping_list_items = ShoppingListItems.objects.create(
             shopping_list_category=shopping_list_category,
             item=item
