@@ -236,7 +236,7 @@ class RecipeCategoryAPI(ViewSet):
             flat=True
         ).first() or 0
 
-        RecipeCategory.objects.get_or_create(
+        recipe_category = RecipeCategory.objects.get_or_create(
             user=user,
             name=category_name,
             defaults={
@@ -246,7 +246,7 @@ class RecipeCategoryAPI(ViewSet):
             }
         )
         return Response(
-            {'message': 'Category saved successfully.'},
+            self.serializer_class(recipe_category, many=False).data,
             status=status.HTTP_201_CREATED
         )
 
@@ -315,17 +315,13 @@ class RecipeAPI(ViewSet):
         user_apple_id = data.get('user_apple_id')
         category_id = data.get('category_id')
 
-        user = get_object_or_404(
-            RecipeJarUser,
-            user_apple_id=user_apple_id
-        )
-        category = get_object_or_404(
-            RecipeCategory,
-            id=category_id
+        recipe_category = get_object_or_404(
+            RecipeCategory.objects.select_related('user'),
+            id=category_id,
+            user__user_apple_id=user_apple_id
         )
         recipes = Recipe.objects.filter(
-            recipe_category=category,
-            recipe_category__user=user
+            recipe_category=recipe_category,
         ).order_by('-id')
         return Response(
             self.recipe_serializer_class(recipes, many=True).data,
