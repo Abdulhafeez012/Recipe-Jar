@@ -78,7 +78,7 @@ class WebExtensionAPI(ViewSet):
 
         for index, step in enumerate(scraper.instructions_list()):
             steps.append({
-                'step': step,
+                'description': step,
                 'order_number': index + 1,
             })
 
