@@ -59,8 +59,8 @@ class ShoppingListCategoryAPI(ViewSet):
             user_apple_id = data.get('user_apple_id')
             name = data.get('name')
             icon = data.get('icon')
+            icon_ascii = ' '.join(map(lambda char: str(ord(char)), icon)) if icon else None
 
-            icon_ascii = ord(icon) if icon else None
             # Get the user and annotate it with the maximum order number of its shopping list categories
             user = get_object_or_404(
                 RecipeJarUser.objects.annotate(

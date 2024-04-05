@@ -38,14 +38,11 @@ class RecipeCategorySerializer(serializers.ModelSerializer):
         exclude = ('created_at', 'updated_at')
 
     def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['user'] = {
-            "id": instance.user.id,
-            "apple_id": instance.user.user_apple_id,
-        }
-        data['name'] = instance.name
-        data['order_number'] = instance.order_number
-        return data
+        response = super().to_representation(instance)
+        response.pop('user', None)
+        response['name'] = instance.name
+        response['order_number'] = instance.order_number
+        return response
 
 
 class RecipeIngredientSerializer(serializers.ModelSerializer):
