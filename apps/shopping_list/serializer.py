@@ -14,7 +14,7 @@ class ShoppingListCategorySerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         response = super().to_representation(instance)
         response['name'] = instance.name
-        response['icon'] = chr(int(instance.icon)) if instance.icon else None
+        response['icon'] = ''.join(chr(int(code)) for code in instance.icon.split()) if instance.icon else None
         response['order_number'] = instance.order_number
         response['number_of_items'] = instance.shopping_list_category.count()
         return response
