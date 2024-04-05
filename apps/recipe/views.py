@@ -236,14 +236,10 @@ class RecipeCategoryAPI(ViewSet):
             flat=True
         ).first() or 0
 
-        recipe_category = RecipeCategory.objects.get_or_create(
+        recipe_category = RecipeCategory.objects.create(
             user=user,
             name=category_name,
-            defaults={
-                "user": user,
-                "name": category_name,
-                "order_number": last_category_order_number + 1,
-            }
+            order_number=last_category_order_number + 1
         )
         return Response(
             self.serializer_class(recipe_category, many=False).data,
@@ -258,7 +254,7 @@ class RecipeCategoryAPI(ViewSet):
             RecipeJarUser,
             user_apple_id=user_apple_id
         )
-        categories = RecipeCategory.objects.filter(user=user).order_by('-id')
+        categories = RecipeCategory.objects.filter(user=user).order_by('id')
         return Response(
             self.serializer_class(categories, many=True).data,
             status=status.HTTP_200_OK
