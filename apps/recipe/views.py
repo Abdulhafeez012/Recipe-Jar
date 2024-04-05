@@ -136,74 +136,66 @@ class WebExtensionAPI(ViewSet):
                 recipe_category=recipe_category
             ).order_by('-order_number').values_list('order_number', flat=True).first() or 0
 
-            new_recipe, created = Recipe.objects.get_or_create(
+            new_recipe = Recipe.objects.create(
                 recipe_category=recipe_category,
-                defaults={
-                    "recipe_category": recipe_category,
-                    "title": recipe_name,
-                    "time": recipe_time,
-                    "picture_url": image_url,
-                    "is_editor_choice": is_editor_choice,
-                    "order_number": last_recipe_order_number + 1
-                }
+                title=recipe_name,
+                time=recipe_time,
+                picture_url=image_url,
+                is_editor_choice=is_editor_choice,
+                order_number=last_recipe_order_number + 1
             )
-            if created:
-                with transaction.atomic():
-                    recipe_ingredients = []
-                    recipe_steps = []
-                    shopping_list_items = []
-                    for ingredient in ingredients:
-                        item_name = ingredient.get('name')
-                        item_quantity = ingredient.get('quantity')
-                        item_unit = ingredient.get('unit')
-                        item_order_number = ingredient.get('order_number')
+            with transaction.atomic():
+                recipe_ingredients = []
+                recipe_steps = []
+                shopping_list_items = []
+                for ingredient in ingredients:
+                    item_name = ingredient.get('name')
+                    item_quantity = ingredient.get('quantity')
+                    item_unit = ingredient.get('unit')
+                    item_order_number = ingredient.get('order_number')
 
-                        item, _ = Items.objects.get_or_create(
-                            name=item_name,
+                    item = Items.objects.create(
+                        name=item_name,
+                    )
+                    recipe_ingredients.append(
+                        RecipeIngredient(
+                            recipe=new_recipe,
+                            items=item,
+                            quantity=item_quantity,
+                            unit=item_unit,
+                            order_number=item_order_number
                         )
-                        recipe_ingredients.append(
-                            RecipeIngredient(
-                                recipe=new_recipe,
-                                items=item,
-                                quantity=item_quantity,
-                                unit=item_unit,
-                                order_number=item_order_number
-                            )
+                    )
+                    if add_to_shopping_list:
+                        shopping_category = ShoppingListCategory.objects.get(
+                            id=shopping_list_category_id
                         )
-                        if add_to_shopping_list:
-                            shopping_category = ShoppingListCategory.objects.get(
-                                id=shopping_list_category_id
-                            )
-                            shopping_list_items.append(
-                                ShoppingListItems(
-                                    item_id=item.id,
-                                    shopping_list__shopping_list_category_id=shopping_category.id,
-                                    shopping_list__is_check=False,
-                                    shopping_list__order_number=item_order_number
-                                )
-                            )
-                    for step in steps:
-                        step_description = step.get('description')
-                        step_order_number = step.get('order_number')
-                        recipe_steps.append(
-                            RecipeStep(
-                                recipe=new_recipe,
-                                description=step_description,
-                                order_number=step_order_number
+                        shopping_list_items.append(
+                            ShoppingListItems(
+                                item_id=item.id,
+                                shopping_list__shopping_list_category_id=shopping_category.id,
+                                shopping_list__is_check=False,
+                                shopping_list__order_number=item_order_number
                             )
                         )
+                for step in steps:
+                    step_description = step.get('description')
+                    step_order_number = step.get('order_number')
+                    recipe_steps.append(
+                        RecipeStep(
+                            recipe=new_recipe,
+                            description=step_description,
+                            order_number=step_order_number
+                        )
+                    )
 
-                    RecipeIngredient.objects.bulk_create(recipe_ingredients)
-                    RecipeStep.objects.bulk_create(recipe_steps)
-                    if shopping_list_items:
-                        ShoppingListItems.objects.bulk_create(shopping_list_items)
-                return Response(
-                    {'message': 'Recipe saved successfully.'},
-                    status=status.HTTP_201_CREATED
-                )
+                RecipeIngredient.objects.bulk_create(recipe_ingredients)
+                RecipeStep.objects.bulk_create(recipe_steps)
+                if shopping_list_items:
+                    ShoppingListItems.objects.bulk_create(shopping_list_items)
             return Response(
-                {'message': 'The Recipe already exists.'},
-                status=status.HTTP_409_CONFLICT
+                {'message': 'Recipe saved successfully.'},
+                status=status.HTTP_201_CREATED
             )
         except Exception as e:
             return Response(
