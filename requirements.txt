@@ -83,3 +83,4 @@ webencodings==0.5.1
 measurement==4.0a8
 python-dotenv==1.0.1
 mysqlclient==2.2.4
+django-jazzmin==2.6.1
