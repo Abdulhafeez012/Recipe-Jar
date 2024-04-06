@@ -173,9 +173,9 @@ class WebExtensionAPI(ViewSet):
                         shopping_list_items.append(
                             ShoppingListItems(
                                 item_id=item.id,
-                                shopping_list__shopping_list_category_id=shopping_category.id,
-                                shopping_list__is_check=False,
-                                shopping_list__order_number=item_order_number
+                                shopping_list_category__id=shopping_category.id,
+                                item__is_check=False,
+                                shopping_list_category__order_number=item_order_number
                             )
                         )
                 for step in steps:
@@ -327,7 +327,7 @@ class RecipeAPI(ViewSet):
         ingredients = RecipeIngredient.objects.filter(recipe=recipe).order_by('order_number')
 
         return Response(
-            {'ingredients': self.ingredient_serializer_class(ingredients, many=True).data},
+            self.ingredient_serializer_class(ingredients, many=True).data,
             status=status.HTTP_200_OK
         )
 
@@ -342,7 +342,7 @@ class RecipeAPI(ViewSet):
         steps = RecipeStep.objects.filter(recipe=recipe).order_by('order_number')
 
         return Response(
-            {'steps': self.step_serializer_class(steps, many=True).data},
+            self.step_serializer_class(steps, many=True).data,
             status=status.HTTP_200_OK
         )
 
