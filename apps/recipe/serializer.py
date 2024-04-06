@@ -51,10 +51,12 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         exclude = ('created_at', 'updated_at')
 
     def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['items'] = instance.items.name
-        data['recipe'] = instance.recipe.title
-        return data
+        response = super().to_representation(instance)
+        response.pop('recipe', None)
+        response.pop('items', None)
+        response['item_name'] = instance.items.name
+        response['recipe_name'] = instance.recipe.title
+        return response
 
 
 class RecipeStepSerializer(serializers.ModelSerializer):
@@ -63,6 +65,7 @@ class RecipeStepSerializer(serializers.ModelSerializer):
         exclude = ('created_at', 'updated_at')
 
     def to_representation(self, instance):
-        data = super().to_representation(instance)
-        data['recipe'] = instance.recipe.title
-        return data
+        response = super().to_representation(instance)
+        response.pop('recipe', None)
+        response['recipe_name'] = instance.recipe.title
+        return response
