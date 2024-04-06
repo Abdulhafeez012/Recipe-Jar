@@ -42,6 +42,7 @@ class RecipeCategorySerializer(serializers.ModelSerializer):
         response.pop('user', None)
         response['name'] = instance.name
         response['order_number'] = instance.order_number
+        response['number_of_items'] = instance.recipes.count()
         return response
 
 
@@ -54,7 +55,7 @@ class RecipeIngredientSerializer(serializers.ModelSerializer):
         response = super().to_representation(instance)
         response.pop('recipe', None)
         response.pop('items', None)
-        response['item_name'] = instance.items.name
+        response['name'] = instance.items.name
         response['recipe_name'] = instance.recipe.title
         return response
 
