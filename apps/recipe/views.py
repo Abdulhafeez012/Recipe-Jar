@@ -156,6 +156,7 @@ class WebExtensionAPI(ViewSet):
 
                     item = Items.objects.create(
                         name=item_name,
+                        is_check=False
                     )
                     recipe_ingredients.append(
                         RecipeIngredient(
@@ -170,12 +171,11 @@ class WebExtensionAPI(ViewSet):
                         shopping_category = ShoppingListCategory.objects.get(
                             id=shopping_list_category_id
                         )
+                        shopping_category.order_number = item_order_number
                         shopping_list_items.append(
                             ShoppingListItems(
-                                item_id=item.id,
-                                shopping_list_category__id=shopping_category.id,
-                                item__is_check=False,
-                                shopping_list_category__order_number=item_order_number
+                                item=item,
+                                shopping_list_category=shopping_category,
                             )
                         )
                 for step in steps:
