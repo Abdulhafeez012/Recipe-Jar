@@ -70,7 +70,7 @@ class HomeViewAPI(ViewSet):
             RecipeJarUser,
             user_apple_id=user_apple_id
         )
-        shopping_list_category = ShoppingListCategory.objects.select_related('user').filter(
+        shopping_list_category = ShoppingListCategory.objects.select_related('user').get(
             user=user,
             is_selected=True
         )
@@ -79,7 +79,7 @@ class HomeViewAPI(ViewSet):
         ).order_by(
             '-created_at'
         )[:4]
-        if shopping_list_category.exists():
+        if shopping_list_category:
             shopping_list_items = ShoppingListItems.objects.select_related('shopping_list_category').filter(
                 shopping_list_category__user=user,
                 shopping_list_category__is_selected=True
