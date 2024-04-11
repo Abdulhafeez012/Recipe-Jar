@@ -70,33 +70,40 @@ class HomeViewAPI(ViewSet):
             RecipeJarUser,
             user_apple_id=user_apple_id
         )
-        shopping_list_category = get_object_or_404(
-            ShoppingListCategory.objects.select_related('user'),
+        shopping_list_category = ShoppingListCategory.objects.select_related('user').filter(
             user=user,
             is_selected=True
         )
-        shopping_list_items = ShoppingListItems.objects.select_related('shopping_list_category').filter(
-            shopping_list_category__user=user,
-            shopping_list_category__is_selected=True
-        )[:4]
         recent_recipes = Recipe.objects.filter(
             recipe_category__user=user
         ).order_by(
             '-created_at'
         )[:4]
+        if shopping_list_category.exists():
+            shopping_list_items = ShoppingListItems.objects.select_related('shopping_list_category').filter(
+                shopping_list_category__user=user,
+                shopping_list_category__is_selected=True
+            )[:4]
+            response = {
+                "recently_added_recipes": self.recipe_serializer_class(recent_recipes, many=True).data,
+                "selected_shopping_list": {
+                    "shopping_list_category_id": shopping_list_category.id,
+                    "shopping_list_category_name": shopping_list_category.name,
+                },
+                "items": self.shopping_serializer_class(shopping_list_items, many=True).data,
+            }
+            return Response(
+                response,
+                status=status.HTTP_200_OK
+            )
+
         response = {
             "recently_added_recipes": self.recipe_serializer_class(recent_recipes, many=True).data,
-            "selected_shopping_list": {
-                "shopping_list_category_id": shopping_list_category.id,
-                "shopping_list_category_name": shopping_list_category.name,
-            },
-            "items": self.shopping_serializer_class(shopping_list_items, many=True).data,
         }
         return Response(
             response,
             status=status.HTTP_200_OK
         )
-
     @action(methods=['get'], detail=False, url_path='get-editor-choices')
     def get_editor_choices(self, request, *args, **kwargs) -> Response:
         """
