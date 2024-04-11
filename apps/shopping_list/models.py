@@ -15,6 +15,11 @@ class ShoppingListCategory(BaseModel):
     icon = models.CharField(
         max_length=100
     )
+    is_selected = models.BooleanField(
+        default=False,
+        null=True,
+        blank=True
+    )
     order_number = models.PositiveIntegerField(
         null=True,
         blank=True
