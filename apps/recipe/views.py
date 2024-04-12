@@ -144,55 +144,54 @@ class WebExtensionAPI(ViewSet):
                 is_editor_choice=is_editor_choice,
                 order_number=last_recipe_order_number + 1
             )
-            with transaction.atomic():
-                recipe_ingredients = []
-                recipe_steps = []
-                shopping_list_items = []
-                for ingredient in ingredients:
-                    item_name = ingredient.get('name')
-                    item_quantity = ingredient.get('quantity')
-                    item_unit = ingredient.get('unit')
-                    item_order_number = ingredient.get('order_number')
+            recipe_ingredients = []
+            recipe_steps = []
+            shopping_list_items = []
+            for ingredient in ingredients:
+                item_name = ingredient.get('name')
+                item_quantity = ingredient.get('quantity')
+                item_unit = ingredient.get('unit')
+                item_order_number = ingredient.get('order_number')
 
-                    item = Items.objects.create(
-                        name=item_name,
-                        is_check=False
+                item = Items.objects.create(
+                    name=item_name,
+                    is_check=False
+                )
+                recipe_ingredients.append(
+                    RecipeIngredient(
+                        recipe=new_recipe,
+                        items=item,
+                        quantity=item_quantity,
+                        unit=item_unit,
+                        order_number=item_order_number
                     )
-                    recipe_ingredients.append(
-                        RecipeIngredient(
-                            recipe=new_recipe,
-                            items=item,
-                            quantity=item_quantity,
-                            unit=item_unit,
-                            order_number=item_order_number
-                        )
+                )
+                if add_to_shopping_list:
+                    shopping_category = ShoppingListCategory.objects.get(
+                        id=shopping_list_category_id
                     )
-                    if add_to_shopping_list:
-                        shopping_category = ShoppingListCategory.objects.get(
-                            id=shopping_list_category_id
-                        )
-                        shopping_category.order_number = item_order_number
-                        shopping_list_items.append(
-                            ShoppingListItems(
-                                item=item,
-                                shopping_list_category=shopping_category,
-                            )
-                        )
-                for step in steps:
-                    step_description = step.get('description')
-                    step_order_number = step.get('order_number')
-                    recipe_steps.append(
-                        RecipeStep(
-                            recipe=new_recipe,
-                            description=step_description,
-                            order_number=step_order_number
+                    shopping_category.order_number = item_order_number
+                    shopping_list_items.append(
+                        ShoppingListItems(
+                            item=item,
+                            shopping_list_category=shopping_category,
                         )
                     )
+            for step in steps:
+                step_description = step.get('description')
+                step_order_number = step.get('order_number')
+                recipe_steps.append(
+                    RecipeStep(
+                        recipe=new_recipe,
+                        description=step_description,
+                        order_number=step_order_number
+                    )
+                )
 
-                RecipeIngredient.objects.bulk_create(recipe_ingredients)
-                RecipeStep.objects.bulk_create(recipe_steps)
-                if shopping_list_items:
-                    ShoppingListItems.objects.bulk_create(shopping_list_items)
+            RecipeIngredient.objects.bulk_create(recipe_ingredients)
+            RecipeStep.objects.bulk_create(recipe_steps)
+            if shopping_list_items:
+                ShoppingListItems.objects.bulk_create(shopping_list_items)
             return Response(
                 {'message': 'Recipe saved successfully.'},
                 status=status.HTTP_201_CREATED
