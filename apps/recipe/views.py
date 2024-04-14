@@ -268,7 +268,7 @@ class RecipeCategoryAPI(ViewSet):
         )
 
     @action(methods=['put'], detail=False, url_path='update-recipe-category')
-    def put(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs) -> Response:
         data = request.data
         category_id = data.get('category_id')
         category_new_name = data.get('new_name')
@@ -342,6 +342,22 @@ class RecipeAPI(ViewSet):
 
         return Response(
             self.step_serializer_class(steps, many=True).data,
+            status=status.HTTP_200_OK
+        )
+
+    @action(methods=['put'], detail=False, url_path='update-is-editor-choice')
+    def set_is_editor_choice(self, request, *args, **kwargs) -> Response:
+        data = request.data
+        recipe_id = data.get('recipe_id')
+        is_editor_choice = data.get('is_editor_choice')
+        recipe = get_object_or_404(
+            Recipe,
+            id=recipe_id
+        )
+        recipe.is_editor_choice = is_editor_choice
+        recipe.save()
+        return Response(
+            {'message': 'Recipe updated successfully.'},
             status=status.HTTP_200_OK
         )
 
