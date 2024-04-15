@@ -70,7 +70,8 @@ class HomeViewAPI(ViewSet):
             RecipeJarUser,
             user_id=user_id
         )
-        shopping_list_category = ShoppingListCategory.objects.select_related('user').get(
+        shopping_list_category = get_object_or_404(
+            ShoppingListCategory.objects.select_related('user'),
             user=user,
             is_selected=True
         )
@@ -104,6 +105,7 @@ class HomeViewAPI(ViewSet):
             response,
             status=status.HTTP_200_OK
         )
+
     @action(methods=['get'], detail=False, url_path='get-editor-choices')
     def get_editor_choices(self, request, *args, **kwargs) -> Response:
         """
