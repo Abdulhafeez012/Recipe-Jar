@@ -37,7 +37,7 @@ class RecipeUserAPI(ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['delete'], detail=False, url_path='delete-user', url_name='delete_user')
+    @action(methods=['delete'], detail=False, url_path='delete-user', url_name='delete_user', permission_classes=[permissions.IsAuthenticated])
     def delete(self, request, *args, **kwargs) -> Response:
         data = request.data
         user_id = data.get('user_id')
