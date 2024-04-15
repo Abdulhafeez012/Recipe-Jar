@@ -35,7 +35,7 @@ class HomeViewAPI(ViewSet):
         Get all shopping list categories
         """
         data = request.data
-        user_apple_id = data.get('user_apple_id')
+        user_id = data.get('user_id')
         shopping_list_category_id = data.get('shopping_list_category_id')
 
         ShoppingListCategory.objects.update(
@@ -44,7 +44,7 @@ class HomeViewAPI(ViewSet):
         shopping_list_category = get_object_or_404(
             ShoppingListCategory.objects.select_related('user'),
             id=shopping_list_category_id,
-            user__user_apple_id=user_apple_id
+            user__user_id=user_id
         )
         shopping_list_category.is_selected = True
         shopping_list_category.save()
@@ -64,11 +64,11 @@ class HomeViewAPI(ViewSet):
         Get all shopping list categories
         """
         date = request.GET
-        user_apple_id = date.get('user_apple_id')
+        user_id = date.get('user_id')
 
         user = get_object_or_404(
             RecipeJarUser,
-            user_apple_id=user_apple_id
+            user_id=user_id
         )
         shopping_list_category = ShoppingListCategory.objects.select_related('user').get(
             user=user,

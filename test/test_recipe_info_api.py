@@ -10,7 +10,7 @@ class RecipeInformationTestCase(APITestCase):
         # Sample valid data for POST request
         data = {
             'website_url': 'https://tasty.co/recipe/pizza-dough',
-            'user_apple_id': 'abed@icloud.com'
+            'user_id': 'abed@icloud.com'
         }
 
         # Make a POST request
@@ -34,7 +34,7 @@ class RecipeInformationTestCase(APITestCase):
 
         # Missing 'website_url' in data
         data = {
-            'user_apple_id': 'abed@icloud.com'
+            'user_id': 'abed@icloud.com'
         }
 
         response = self.client.post(url, data, format='json')
@@ -43,7 +43,7 @@ class RecipeInformationTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('website_url', response.data['error'])
 
-        # Missing 'user_apple_id' in data
+        # Missing 'user_id' in data
         data = {
             'website_url': 'https://tasty.co/recipe/pizza-dough'
         }
@@ -52,15 +52,15 @@ class RecipeInformationTestCase(APITestCase):
 
         # Assert the response status code
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertIn('user_apple_id', response.data['error'])
+        self.assertIn('user_id', response.data['error'])
 
     def test_post_invalid_user(self):
         url = reverse('get_recipe_information')  # Assuming you have a URL name for this view
 
-        # Non-existent user_apple_id
+        # Non-existent user_id
         data = {
             'website_url': 'https://tasty.co/recipe/pizza-dough',
-            'user_apple_id': 'test@icloud.com'
+            'user_id': 'test@icloud.com'
         }
 
         response = self.client.post(url, data, format='json')

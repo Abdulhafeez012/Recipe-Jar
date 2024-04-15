@@ -44,14 +44,14 @@ class WebExtensionAPI(ViewSet):
     def get(self, request, *args, **kwargs) -> Response:
         data = request.GET
         web_url = data.get('website_url')
-        user_apple_id = data.get('user_apple_id')
-        if not user_apple_id:
+        user_id = data.get('user_id')
+        if not user_id:
             return Response(
                 {'error': 'user_id are required.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         try:
-            user = RecipeJarUser.objects.get(user_apple_id=user_apple_id)
+            user = RecipeJarUser.objects.get(user_id=user_id)
         except RecipeJarUser.DoesNotExist:
             return Response(
                 {'error': 'User not found.'},
@@ -105,7 +105,7 @@ class WebExtensionAPI(ViewSet):
     def post(self, request, *args, **kwargs) -> Response:
         data = request.data
         try:
-            user_apple_id = data.get('user_apple_id')
+            user_id = data.get('user_id')
             recipe_category_id = data.get('recipe_category_id')
             is_editor_choice = data.get('is_editor_choice')
             shopping_list_category_id = data.get('shopping_list_category_id')
@@ -116,14 +116,14 @@ class WebExtensionAPI(ViewSet):
             ingredients = data.get('ingredients')
             steps = data.get('steps')
 
-            if not user_apple_id or not recipe_category_id:
+            if not user_id or not recipe_category_id:
                 return Response(
                     {'error': 'user_id and recipe_category_id  are required.'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             user = get_object_or_404(
                 RecipeJarUser,
-                user_apple_id=user_apple_id
+                user_id=user_id
             )
 
             recipe_category = get_object_or_404(
@@ -213,12 +213,12 @@ class RecipeCategoryAPI(ViewSet):
     @action(methods=['post'], detail=False, url_path='save-recipe-category')
     def post(self, request, *args, **kwargs) -> Response:
         data = request.data
-        user_apple_id = data.get('user_apple_id')
+        user_id = data.get('user_id')
         category_name = data.get('category_name')
 
         user = get_object_or_404(
             RecipeJarUser,
-            user_apple_id=user_apple_id
+            user_id=user_id
         )
         last_category_order_number = RecipeCategory.objects.filter(
             user=user
@@ -240,10 +240,10 @@ class RecipeCategoryAPI(ViewSet):
     @action(methods=['get'], detail=False, url_path='get-all-recipe-categories')
     def get(self, request, *args, **kwargs) -> Response:
         data = request.GET
-        user_apple_id = data.get('user_apple_id')
+        user_id = data.get('user_id')
         user = get_object_or_404(
             RecipeJarUser,
-            user_apple_id=user_apple_id
+            user_id=user_id
         )
         categories = RecipeCategory.objects.filter(user=user).order_by('id')
         return Response(
@@ -299,13 +299,13 @@ class RecipeAPI(ViewSet):
     def get_recipe(self, request, *args, **kwargs) -> Response:
         data = request.GET
 
-        user_apple_id = data.get('user_apple_id')
+        user_id = data.get('user_id')
         category_id = data.get('category_id')
 
         recipe_category = get_object_or_404(
             RecipeCategory.objects.select_related('user'),
             id=category_id,
-            user__user_apple_id=user_apple_id
+            user__user_id=user_id
         )
         recipes = Recipe.objects.filter(
             recipe_category=recipe_category,
