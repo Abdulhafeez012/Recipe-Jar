@@ -19,7 +19,7 @@ class RecipeUserAPI(ViewSet):
     serializer_class = RecipeUserSerializer
 
     @action(methods=['post'], detail=False, url_path='create-user', url_name='create_user')
-    def post(self, request):
+    def post(self, request, *args, **kwargs) -> Response:
         user_uuid = uuid.uuid4()
         user = User.objects.create_user(
             username=user_uuid,
@@ -38,7 +38,7 @@ class RecipeUserAPI(ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['delete'], detail=False, url_path='delete-user', url_name='delete_user')
-    def delete(self, request):
+    def delete(self, request, *args, **kwargs) -> Response:
         data = request.data
         user_id = data.get('user_id')
         user = get_object_or_404(
@@ -49,7 +49,7 @@ class RecipeUserAPI(ViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(methods=['get'], detail=False, url_path='get-token', url_name='get_token')
-    def get(self, request):
+    def get(self, request, *args, **kwargs) -> Response:
         data = request.GET
         user_id = data.get('user_id')
         user = get_object_or_404(
