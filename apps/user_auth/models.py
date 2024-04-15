@@ -7,7 +7,9 @@ from django.contrib.auth.models import User
 class RecipeJarUser(BaseModel):
     django_user = models.OneToOneField(
         User,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
     user_id = models.UUIDField(
         primary_key=True,
