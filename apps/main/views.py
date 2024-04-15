@@ -70,11 +70,11 @@ class HomeViewAPI(ViewSet):
             RecipeJarUser,
             user_id=user_id
         )
-        shopping_list_category = get_object_or_404(
-            ShoppingListCategory.objects.select_related('user'),
+        shopping_list_category = ShoppingListCategory.objects.select_related('user').filter(
             user=user,
             is_selected=True
         )
+
         recent_recipes = Recipe.objects.filter(
             recipe_category__user=user
         ).order_by(
