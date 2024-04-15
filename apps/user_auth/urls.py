@@ -1,16 +1,15 @@
+from apps.user_auth import views
+from rest_framework import routers
 from django.urls import (
     path,
     include
 )
-from apps.user_auth import views
-from rest_framework import routers
 
-# routers = routers.DefaultRouter()
-# routers.register(r'list-users', views.ListUserView)
+routers = routers.DefaultRouter()
+routers.register(r'', views.RecipeUserAPI, basename='recipe_user')
 
 urlpatterns = [
-    # path('', include(routers.urls)),
-    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('', include(routers.urls)),
 ]
 
 

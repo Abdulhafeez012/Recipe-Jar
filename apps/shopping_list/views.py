@@ -33,9 +33,9 @@ class ShoppingListCategoryAPI(ViewSet):
         """
         try:
             data = request.GET
-            user_apple_id = data.get('user_apple_id')
+            user_id = data.get('user_id')
             shopping_list_categories = ShoppingListCategory.objects.filter(
-                user__user_apple_id=user_apple_id
+                user__user_id=user_id
             ).order_by(
                 'order_number'
             )
@@ -56,7 +56,7 @@ class ShoppingListCategoryAPI(ViewSet):
         """
         try:
             data = request.data
-            user_apple_id = data.get('user_apple_id')
+            user_id = data.get('user_id')
             name = data.get('name')
             icon = data.get('icon')
             icon_ascii = ' '.join(map(lambda char: str(ord(char)), icon)) if icon else None
@@ -66,7 +66,7 @@ class ShoppingListCategoryAPI(ViewSet):
                 RecipeJarUser.objects.annotate(
                     max_order_number=Max('shopping_list_category__order_number')
                 ),
-                user_apple_id=user_apple_id
+                user_id=user_id
             )
 
             # If the user has no shopping list categories, max_order_number will be None, so we default it to 0
@@ -95,14 +95,14 @@ class ShoppingListCategoryAPI(ViewSet):
         """
         try:
             data = request.data
-            user_apple_id = data.get('user_apple_id')
+            user_id = data.get('user_id')
             name = data.get('name')
             icon = data.get('icon')
             shopping_list_category_id = data.get('shopping_list_category_id')
 
             shopping_list_category = get_object_or_404(
                 ShoppingListCategory.objects.select_related('user'),
-                user__user_apple_id=user_apple_id,
+                user__user_id=user_id,
                 id=shopping_list_category_id
             )
             if icon:
@@ -128,11 +128,11 @@ class ShoppingListCategoryAPI(ViewSet):
         """
         try:
             data = request.data
-            user_apple_id = data.get('user_apple_id')
+            user_id = data.get('user_id')
             shopping_list_category_id = data.get('shopping_list_category_id')
 
             shopping_list_category = ShoppingListCategory.objects.select_related('user').get(
-                user__user_apple_id=user_apple_id,
+                user__user_id=user_id,
                 id=shopping_list_category_id
             )
             shopping_list_category.delete()
