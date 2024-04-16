@@ -47,7 +47,7 @@ class ShoppingListItems(BaseModel):
     shopping_list_category = models.ForeignKey(
         ShoppingListCategory,
         on_delete=models.CASCADE,
-        related_name='shopping_list_category'
+        related_name='shopping_list_items'
     )
     item = models.ForeignKey(
         Items,
