@@ -70,7 +70,11 @@ class HomeViewAPI(ViewSet):
             RecipeJarUser,
             user_id=user_id
         )
-        shopping_list_category = ShoppingListCategory.objects.select_related('user').filter(
+        shopping_list_category = ShoppingListCategory.objects.select_related(
+            'user'
+        ).prefetch_related(
+            'shopping_list_items'
+        ).filter(
             user=user,
             is_selected=True
         )
@@ -80,18 +84,20 @@ class HomeViewAPI(ViewSet):
         ).order_by(
             '-created_at'
         )[:4]
-        if shopping_list_category:
+        if len(shopping_list_category) == 1:
             shopping_list_items = ShoppingListItems.objects.select_related('shopping_list_category').filter(
-                shopping_list_category__user=user,
-                shopping_list_category__is_selected=True
+                shopping_list_category=shopping_list_category.get()
             )[:4]
             response = {
                 "recently_added_recipes": self.recipe_serializer_class(recent_recipes, many=True).data,
                 "selected_shopping_list": {
-                    "shopping_list_category_id": shopping_list_category.id,
-                    "shopping_list_category_name": shopping_list_category.name,
+                    "shopping_list_category_id": shopping_list_category.get().id,
+                    "shopping_list_category_name": shopping_list_category.get().name,
                 },
-                "items": self.shopping_serializer_class(shopping_list_items, many=True).data,
+                "items": self.shopping_serializer_class(
+                    shopping_list_items,
+                    many=True
+                ).data if shopping_list_items else []
             }
             return Response(
                 response,
