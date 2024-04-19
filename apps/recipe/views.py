@@ -82,17 +82,12 @@ class WebExtensionAPI(ViewSet):
                 'order_number': index + 1,
             })
 
-        for name, value in scraper.nutrients().items():
-            nutrients[name] = value
-
         recipe = {
-            'author': scraper.author(),
             'title': scraper.title(),
             'recipe_category': scraper.category(),
             'picture_url': scraper.image(),
             'ingredients': ingredients,
             'steps': steps,
-            'nutrients': nutrients,
             'rating': scraper.ratings(),
         }
         response_data = {
@@ -148,10 +143,10 @@ class WebExtensionAPI(ViewSet):
             recipe_steps = []
             shopping_list_items = []
             for ingredient in ingredients:
-                item_name = ingredient.get('name')
-                item_quantity = ingredient.get('quantity')
-                item_unit = ingredient.get('unit')
-                item_order_number = ingredient.get('order_number')
+                item_name = ingredient.get('name') if ingredient.get('name') else " "
+                item_quantity = ingredient.get('quantity') if ingredient.get('quantity') else 0
+                item_unit = ingredient.get('unit') if ingredient.get('unit') else " "
+                item_order_number = ingredient.get('order_number') if ingredient.get('order_number') else 0
 
                 item = Items.objects.create(
                     name=item_name,
@@ -178,8 +173,8 @@ class WebExtensionAPI(ViewSet):
                         )
                     )
             for step in steps:
-                step_description = step.get('description')
-                step_order_number = step.get('order_number')
+                step_description = step.get('description') if step.get('description') else " "
+                step_order_number = step.get('order_number') if step.get('order_number') else 0
                 recipe_steps.append(
                     RecipeStep(
                         recipe=new_recipe,
