@@ -93,6 +93,7 @@ class HomeViewAPI(ViewSet):
                 "selected_shopping_list": {
                     "shopping_list_category_id": shopping_list_category.get().id,
                     "shopping_list_category_name": shopping_list_category.get().name,
+                    "shopping_list_category_icon": ''.join(chr(int(code)) for code in shopping_list_category.get().icon.split()) if shopping_list_category.get().icon else "",
                 },
                 "items": self.shopping_serializer_class(
                     shopping_list_items,
