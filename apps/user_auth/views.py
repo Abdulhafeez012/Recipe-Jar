@@ -59,7 +59,6 @@ class RecipeUserAPI(ViewSet):
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # implement a method to check if the user exists
     @action(methods=['get'], detail=False, url_path='check-user', url_name='check_user')
     def check_user(self, request, *args, **kwargs) -> Response:
         data = request.GET
