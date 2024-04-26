@@ -128,3 +128,53 @@ class HomeViewAPI(ViewSet):
             self.recipe_serializer_class(recipes, many=True).data,
             status=status.HTTP_200_OK
         )
+
+    @action(methods=['get'], detail=False, url_path='get-saved-recipes')
+    def get_saved_recipes(self, request, *args, **kwargs) -> Response:
+        """
+        Get all shopping list categories
+        """
+        data = request.GET
+        user_id = data.get('user_id')
+        user = get_object_or_404(
+            RecipeJarUser,
+            user_id=user_id
+        )
+        recipes = Recipe.objects.filter(
+            recipe_category__user=user
+        )
+        # Initialize a dictionary to store non-duplicate objects
+        non_duplicate_recipes_dict = {}
+
+        # Loop through all objects from class A
+        for recipe in recipes:
+            # Create a unique key for the object based on its name and related objects
+            key = (
+                recipe.title,
+                tuple(
+                    recipe.ingredients_recipe.values_list(
+                        'quantity',
+                        'unit',
+                        'order_number'
+                    )
+                ),
+                tuple(
+                    recipe.steps.values_list(
+                        'description',
+                        'order_number'
+                    )
+                )
+            )
+            # Add the object to the dictionary if the key doesn't exist
+            if key not in non_duplicate_recipes_dict:
+                non_duplicate_recipes_dict[key] = recipe
+
+        # Retrieve non-duplicate objects from the dictionary
+        non_duplicate_recipes = list(
+            non_duplicate_recipes_dict.values()
+        )
+
+        return Response(
+            self.recipe_serializer_class(non_duplicate_recipes, many=True).data,
+            status=status.HTTP_200_OK
+        )
