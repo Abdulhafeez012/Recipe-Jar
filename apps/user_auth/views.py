@@ -59,12 +59,18 @@ class RecipeUserAPI(ViewSet):
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=False, url_path='check-user', url_name='check_user')
-    def check_user(self, request, *args, **kwargs) -> Response:
+    @action(methods=['get'], detail=False, url_path='check-user', url_name='check_user', permission_classes=[permissions.IsAuthenticated])
+    def check_user(self, request, *args, **kwargs) -> Response or None:
         data = request.GET
         user_id = data.get('user_id')
         try:
-            RecipeJarUser.objects.get(user_id=user_id)
-            return Response({'is_exists': True}, status=status.HTTP_200_OK)
+            user = RecipeJarUser.objects.filter(
+                user_id=user_id
+            )
+            return Response(
+                self.serializer_class(user, many=True).data,
+                status=status.HTTP_200_OK
+            )
         except RecipeJarUser.DoesNotExist:
-            return Response({'is_exists': False}, status=status.HTTP_404_NOT_FOUND)
+            return None
+
