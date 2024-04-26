@@ -59,7 +59,7 @@ class RecipeUserAPI(ViewSet):
         serializer = self.serializer_class(user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @action(methods=['get'], detail=False, url_path='check-user', url_name='check_user')
+    @action(methods=['get'], detail=False, url_path='check-user', url_name='check_user', permission_classes=[permissions.IsAuthenticated])
     def check_user(self, request, *args, **kwargs) -> Response or None:
         data = request.GET
         user_id = data.get('user_id')
