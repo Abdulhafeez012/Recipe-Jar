@@ -106,7 +106,7 @@ class ShoppingListCategoryAPI(ViewSet):
                 id=shopping_list_category_id
             )
             if icon:
-                icon_ascii = ord(icon)
+                icon_ascii = ' '.join(map(lambda char: str(ord(char)), icon))
                 shopping_list_category.icon = icon_ascii
             if name:
                 shopping_list_category.name = name
