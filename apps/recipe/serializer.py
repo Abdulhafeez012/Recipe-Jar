@@ -43,6 +43,9 @@ class RecipeCategorySerializer(serializers.ModelSerializer):
         response['name'] = instance.name
         response['order_number'] = instance.order_number
         response['number_of_items'] = instance.recipes.count()
+        response['recenlty_recipes_added'] = [
+            recipe.picture_url for recipe in instance.recipes.all()[:4]
+        ]
         return response
 
 
