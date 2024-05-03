@@ -161,7 +161,7 @@ STATICFILES_DIRS = (
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-YOUTUBE_DATA_API_KEY = '120471301674-mtikp51apj4mmc79olnngac9plr9ft6p.apps.googleusercontent.com'
+YOUTUBE_DATA_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 # JAZZMIN SETTINGS
 

@@ -1,4 +1,5 @@
-from django.db import transaction
+from googleapiclient.discovery import build
+from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
@@ -63,7 +64,6 @@ class WebExtensionAPI(ViewSet):
 
         ingredients = []
         steps = []
-        nutrients = {}
 
         for index, ingredient in enumerate(scraper.ingredients()):
             quantity, unit = parse_quantity_and_unit(ingredient)
@@ -130,12 +130,23 @@ class WebExtensionAPI(ViewSet):
             last_recipe_order_number = Recipe.objects.filter(
                 recipe_category=recipe_category
             ).order_by('-order_number').values_list('order_number', flat=True).first() or 0
+            youtube = build('youtube', 'v3', developerKey=settings.YOUTUBE_DATA_API_KEY)
+            youtube_request = youtube.search().list(
+                part='snippet',
+                q=recipe_name,
+                type='video',
+                maxResults=1,
+                order='viewCount',
+            ).execute()
 
             new_recipe = Recipe.objects.create(
                 recipe_category=recipe_category,
                 title=recipe_name,
                 time=recipe_time,
                 picture_url=image_url,
+                video_url=f"https://www.youtube.com/watch?v={youtube_request['items'][0]['id']['videoId']}",
+                video_image_url=youtube_request['items'][0]['snippet']['thumbnails']['high']['url'],
+                video_title=youtube_request['items'][0]['snippet']['title'],
                 is_editor_choice=is_editor_choice,
                 order_number=last_recipe_order_number + 1
             )
