@@ -59,7 +59,8 @@ class Recipe(BaseModel):
         null=True,
         blank=True
     )
-    video_duration = models.TimeField(
+    video_duration = models.CharField(
+        max_length=500,
         null=True,
         blank=True
     )
@@ -68,7 +69,8 @@ class Recipe(BaseModel):
         null=True,
         blank=True
     )
-    video_posted_date = models.DateTimeField(
+    video_posted_date = models.CharField(
+        max_length=500,
         null=True,
         blank=True
     )

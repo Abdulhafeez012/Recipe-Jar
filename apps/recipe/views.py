@@ -1,11 +1,10 @@
-from googleapiclient.discovery import build
-from django.conf import settings
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.decorators import action
 from recipe_scrapers import scrape_me
 from quantulum3 import parser
+from apps.recipe.external_apis import YouTubeAPI
 from apps.recipe.serializer import (
     RecipeSerializer,
     RecipeCategorySerializer,
@@ -99,6 +98,7 @@ class WebExtensionAPI(ViewSet):
     @action(methods=['post'], detail=False, url_path='save-recipe')
     def post(self, request, *args, **kwargs) -> Response:
         data = request.data
+        youtube_api = YouTubeAPI()
         try:
             user_id = data.get('user_id')
             recipe_category_id = data.get('recipe_category_id')
@@ -130,23 +130,27 @@ class WebExtensionAPI(ViewSet):
             last_recipe_order_number = Recipe.objects.filter(
                 recipe_category=recipe_category
             ).order_by('-order_number').values_list('order_number', flat=True).first() or 0
-            youtube = build('youtube', 'v3', developerKey=settings.YOUTUBE_DATA_API_KEY)
-            youtube_request = youtube.search().list(
-                part='snippet',
+
+            youtube_request = youtube_api.search(
                 q=recipe_name,
-                type='video',
-                maxResults=1,
-                order='viewCount',
-            ).execute()
+                max_results=1
+            )
+            video_id = youtube_request['items'][0]['id']['videoId']
+            duration = youtube_api.video_duration(video_id)
+            posted_date = youtube_api.video_posted_date(video_id)
+            channel_name = youtube_api.video_channel_name(video_id)
 
             new_recipe = Recipe.objects.create(
                 recipe_category=recipe_category,
                 title=recipe_name,
                 time=recipe_time,
                 picture_url=image_url,
-                video_url=f"https://www.youtube.com/watch?v={youtube_request['items'][0]['id']['videoId']}",
+                video_url=f"https://www.youtube.com/watch?v={video_id}",
                 video_image_url=youtube_request['items'][0]['snippet']['thumbnails']['high']['url'],
                 video_title=youtube_request['items'][0]['snippet']['title'],
+                video_channel_name=channel_name,
+                video_duration=duration,
+                video_posted_date=posted_date,
                 is_editor_choice=is_editor_choice,
                 order_number=last_recipe_order_number + 1
             )
