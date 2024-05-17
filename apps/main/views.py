@@ -188,3 +188,17 @@ class HomeViewAPI(ViewSet):
             response,
             status=status.HTTP_200_OK
         )
+
+    @action(methods=['post'], detail=False, url_path='change-ocr-flag', permissions=[permissions.AllowAny])
+    def change_ocr_flag(self, request, *args, **kwargs) -> Response:
+        """
+        Change OCR flag
+        """
+        data = request.data
+        ocr_flag = data.get('ocr_flag')
+        return Response(
+            {
+                "ocr_flag": ocr_flag
+            },
+            status=status.HTTP_200_OK
+        )
