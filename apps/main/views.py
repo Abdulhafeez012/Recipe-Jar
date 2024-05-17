@@ -26,6 +26,7 @@ class HomeViewAPI(ViewSet):
     Home View APIs
     """
     shopping_serializer_class = ShoppingListItemsSerializer
+    shopping_category_serializer_class = ShoppingListCategorySerializer
     recipe_serializer_class = RecipeSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -58,7 +59,7 @@ class HomeViewAPI(ViewSet):
             status=status.HTTP_200_OK
         )
 
-    @action(methods=['get'], detail=False, url_path='get-data')
+    @action(methods=['get'], detail=False, url_path='get-recently-added-recipes')
     def get_home_view_data(self, request, *args, **kwargs) -> Response:
         """
         Get all shopping list categories
@@ -70,40 +71,11 @@ class HomeViewAPI(ViewSet):
             RecipeJarUser,
             user_id=user_id
         )
-        shopping_list_category = ShoppingListCategory.objects.select_related(
-            'user'
-        ).prefetch_related(
-            'shopping_list_items'
-        ).filter(
-            user=user,
-            is_selected=True
-        )
-
         recent_recipes = Recipe.objects.filter(
             recipe_category__user=user
         ).order_by(
             '-created_at'
         )[:4]
-        if len(shopping_list_category) == 1:
-            shopping_list_items = ShoppingListItems.objects.select_related('shopping_list_category').filter(
-                shopping_list_category=shopping_list_category.get()
-            )[:4]
-            response = {
-                "recently_added_recipes": self.recipe_serializer_class(recent_recipes, many=True).data,
-                "selected_shopping_list": {
-                    "shopping_list_category_id": shopping_list_category.get().id,
-                    "shopping_list_category_name": shopping_list_category.get().name,
-                    "shopping_list_category_icon": ''.join(chr(int(code)) for code in shopping_list_category.get().icon.split()) if shopping_list_category.get().icon else "",
-                },
-                "items": self.shopping_serializer_class(
-                    shopping_list_items,
-                    many=True
-                ).data if shopping_list_items else []
-            }
-            return Response(
-                response,
-                status=status.HTTP_200_OK
-            )
 
         response = {
             "recently_added_recipes": self.recipe_serializer_class(recent_recipes, many=True).data,
@@ -176,5 +148,43 @@ class HomeViewAPI(ViewSet):
 
         return Response(
             self.recipe_serializer_class(non_duplicate_recipes, many=True).data,
+            status=status.HTTP_200_OK
+        )
+
+    @action(methods=['get'], detail=False, url_path='get-selected-shopping-category')
+    def get_selected_shopping_category(self, request, *args, **kwargs) -> Response:
+        """
+        Get all shopping list categories selected by the user
+        """
+        data = request.GET
+        user_id = data.get('user_id')
+        user = get_object_or_404(
+            RecipeJarUser,
+            user_id=user_id
+        )
+        shopping_list_category = ShoppingListCategory.objects.select_related(
+            'user'
+        ).prefetch_related(
+            'shopping_list_items'
+        ).filter(
+            user=user,
+            is_selected=True
+        )
+        shopping_list_items = ShoppingListItems.objects.select_related('shopping_list_category').filter(
+            shopping_list_category=shopping_list_category.get()
+        )[:4]
+        response = {
+            "selected_shopping_category":
+                self.shopping_category_serializer_class(
+                    shopping_list_category,
+                    many=True
+                ).data if shopping_list_category else [],
+            "items": self.shopping_serializer_class(
+                shopping_list_items,
+                many=True
+            ).data if shopping_list_items else []
+        }
+        return Response(
+            response,
             status=status.HTTP_200_OK
         )
