@@ -189,7 +189,7 @@ class HomeViewAPI(ViewSet):
             status=status.HTTP_200_OK
         )
 
-    @action(methods=['post'], detail=False, url_path='change-ocr-flag', permissions=[permissions.AllowAny])
+    @action(methods=['post'], detail=False, url_path='change-ocr-flag', permission_classes=[permissions.AllowAny])
     def change_ocr_flag(self, request, *args, **kwargs) -> Response:
         """
         Change OCR flag

@@ -82,7 +82,7 @@ class WebExtensionAPI(ViewSet):
             })
 
         quantities = parser.parse(scraper.yields())
-        serving = 0
+        serving = 1
         for quantity in quantities:
             if quantity.unit.name in ["serving", "servings", "portion", "portions"]:
                 serving = float(quantity.value)
