@@ -87,22 +87,22 @@ class WebExtensionAPI(ViewSet):
             if quantity.unit.name in ["serving", "servings", "portion", "portions"]:
                 serving = float(quantity.value)
                 break
-                recipe = {
-                    'title': scraper.title(),
-                    'recipe_category': scraper.category(),
-                    'picture_url': scraper.image(),
-                    'ingredients': ingredients,
-                    'steps': steps,
-                    'serving': serving,
-                    'rating': scraper.ratings(),
-                }
+        recipe = {
+            'title': scraper.title(),
+            'recipe_category': scraper.category(),
+            'picture_url': scraper.image(),
+            'ingredients': ingredients,
+            'steps': steps,
+            'serving': serving,
+            'rating': scraper.ratings(),
+        }
         response_data = {
             'recipe': recipe,
             'categories': self.serializer_class(categories, many=True).data
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, url_path='save-recipe')
+    @action(methods=['post'], detail=False, url_path='save-recipe')-
     def post(self, request, *args, **kwargs) -> Response:
         data = request.data
         youtube_api = YouTubeAPI()
