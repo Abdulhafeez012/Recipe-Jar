@@ -13,6 +13,8 @@ class ShoppingListCategorySerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
+        response.pop('user', None)
+        response.pop('is_selected', None)
         response['name'] = instance.name
         response['icon'] = ''.join(chr(int(code)) for code in instance.icon.split()) if instance.icon else None
         response['order_number'] = instance.order_number
