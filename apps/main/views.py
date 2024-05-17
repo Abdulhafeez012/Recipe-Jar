@@ -169,15 +169,15 @@ class HomeViewAPI(ViewSet):
         ).filter(
             user=user,
             is_selected=True
-        )
+        ).first()
         shopping_list_items = ShoppingListItems.objects.select_related('shopping_list_category').filter(
-            shopping_list_category=shopping_list_category.get()
+            shopping_list_category=shopping_list_category
         )[:4]
         response = {
             "selected_shopping_category":
                 self.shopping_category_serializer_class(
                     shopping_list_category,
-                    many=True
+                    many=False
                 ).data if shopping_list_category else [],
             "items": self.shopping_serializer_class(
                 shopping_list_items,
