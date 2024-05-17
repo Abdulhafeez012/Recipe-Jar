@@ -102,7 +102,7 @@ class WebExtensionAPI(ViewSet):
         }
         return Response(response_data, status=status.HTTP_200_OK)
 
-    @action(methods=['post'], detail=False, url_path='save-recipe')-
+    @action(methods=['post'], detail=False, url_path='save-recipe')
     def post(self, request, *args, **kwargs) -> Response:
         data = request.data
         youtube_api = YouTubeAPI()
