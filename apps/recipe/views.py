@@ -81,14 +81,21 @@ class WebExtensionAPI(ViewSet):
                 'order_number': index + 1,
             })
 
-        recipe = {
-            'title': scraper.title(),
-            'recipe_category': scraper.category(),
-            'picture_url': scraper.image(),
-            'ingredients': ingredients,
-            'steps': steps,
-            'rating': scraper.ratings(),
-        }
+        quantities = parser.parse(scraper.yields())
+        serving = 0
+        for quantity in quantities:
+            if quantity.unit.name in ["serving", "servings", "portion", "portions"]:
+                serving = float(quantity.value)
+                break
+                recipe = {
+                    'title': scraper.title(),
+                    'recipe_category': scraper.category(),
+                    'picture_url': scraper.image(),
+                    'ingredients': ingredients,
+                    'steps': steps,
+                    'serving': serving,
+                    'rating': scraper.ratings(),
+                }
         response_data = {
             'recipe': recipe,
             'categories': self.serializer_class(categories, many=True).data
