@@ -54,8 +54,19 @@ class HomeViewAPI(ViewSet):
         ).order_by(
             'id'
         )[:4]
+        response = {
+            "selected_shopping_category":
+                self.shopping_category_serializer_class(
+                    shopping_list_category,
+                    many=False
+                ).data if shopping_list_category else [],
+            "items": self.shopping_serializer_class(
+                shopping_list_items,
+                many=True
+            ).data if shopping_list_items else []
+        }
         return Response(
-            self.shopping_serializer_class(shopping_list_items, many=True).data,
+            response,
             status=status.HTTP_200_OK
         )
 
