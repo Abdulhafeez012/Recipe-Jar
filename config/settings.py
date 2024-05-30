@@ -167,7 +167,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/Recipe-Jar/debug.log',
+            'filename': '/var/log/recipe-jar-logs/',
         },
     },
     'loggers': {
