@@ -169,36 +169,41 @@ class HomeViewAPI(ViewSet):
         """
         data = request.GET
         user_id = data.get('user_id')
-        user = get_object_or_404(
-            RecipeJarUser,
-            user_id=user_id
-        )
-        shopping_list_category = ShoppingListCategory.objects.select_related(
-            'user'
-        ).prefetch_related(
-            'shopping_list_items'
-        ).filter(
-            user=user,
-            is_selected=True
-        ).first()
-        shopping_list_items = ShoppingListItems.objects.select_related('shopping_list_category').filter(
-            shopping_list_category=shopping_list_category
-        )[:4]
-        response = {
-            "selected_shopping_category":
-                self.shopping_category_serializer_class(
-                    shopping_list_category,
-                    many=False
-                ).data if shopping_list_category else [],
-            "items": self.shopping_serializer_class(
-                shopping_list_items,
-                many=True
-            ).data if shopping_list_items else []
-        }
-        return Response(
-            response,
-            status=status.HTTP_200_OK
-        )
+        try:
+            # Fetch the shopping list category and items in one query
+            shopping_list_category = ShoppingListCategory.objects.select_related('user').filter(
+                user__user_id=user_id,
+                is_selected=True
+            ).prefetch_related(
+                'shopping_list_items'
+            ).first()
+
+            shopping_list_items = shopping_list_category.shopping_list_items.all()[:4]
+            response = {
+                "selected_shopping_category":
+                    self.shopping_category_serializer_class(
+                        shopping_list_category,
+                        many=False
+                    ).data if shopping_list_category else [],
+                "items": self.shopping_serializer_class(
+                    shopping_list_items,
+                    many=True
+                ).data if shopping_list_items else []
+            }
+            return Response(
+                response,
+                status=status.HTTP_200_OK
+            )
+        except ShoppingListCategory.DoesNotExist:
+            return Response(
+                f"Shopping List Category with user id: {user_id} not found",
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except ShoppingListItems.DoesNotExist:
+            return Response(
+                f"Shopping List Items with user id: {user_id} not found",
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(methods=['post'], detail=False, url_path='change-ocr-flag', permission_classes=[permissions.AllowAny])
     def change_ocr_flag(self, request, *args, **kwargs) -> Response:
