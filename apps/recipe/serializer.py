@@ -18,7 +18,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             "id": instance.recipe_category.id,
             "name": instance.recipe_category.name,
             "order_number": instance.recipe_category.order_number
-        }
+        } if instance.recipe_category else {}
         data['title'] = instance.title
         data['time'] = instance.time
         data['picture_url'] = instance.picture_url
