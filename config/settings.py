@@ -167,7 +167,8 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/recipe-jar-logs/debug.log',
+            'filename': os.path.join(BASE_DIR, 'debug.log'),
+            'maxBytes': 1024 * 1024 * 100,  # 100 MB
         },
     },
     'loggers': {
