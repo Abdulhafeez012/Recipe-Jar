@@ -1,0 +1,42 @@
+name: Build and Deploy To Digital Ocean DropLets
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: abedzalloom/recipe-jar:latest
+
+      - name: Deploy to Digital Ocean DropLets
+        uses: digitalocean/action-doctl@v2
+        with:
+          host: ${{ secrets.DIGITALOCESN_HOST }}
+          username: ${{ secrets.DIGITALOCESN_USERNAME }}
+          key: ${{ secrets.DIGITALOCESN_SSH_KEY }}
+          port: ${{ secrets.DIGITALOCESN_PORT }}
+          script: |
+            cd /home/Recipe-Jar
+            docker-compose pull web
+            docker-compose up -d  --build web

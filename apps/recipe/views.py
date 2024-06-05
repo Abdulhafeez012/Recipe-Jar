@@ -29,7 +29,8 @@ from apps.recipe.models import (
 )
 from apps.recipe.utils import (
     parse_quantity_and_unit,
-    extract_ingredient_name
+    extract_ingredient_name,
+    extract_time_duration
 )
 
 
@@ -63,6 +64,7 @@ class WebExtensionAPI(ViewSet):
 
         ingredients = []
         steps = []
+        time = 0
 
         for index, ingredient in enumerate(scraper.ingredients()):
             quantity, unit = parse_quantity_and_unit(ingredient)
@@ -81,6 +83,8 @@ class WebExtensionAPI(ViewSet):
                 'order_number': index + 1,
             })
 
+        time = extract_time_duration(web_url)
+
         quantities = parser.parse(scraper.yields())
         serving = 1
         for quantity in quantities:
@@ -89,6 +93,7 @@ class WebExtensionAPI(ViewSet):
                 break
         recipe = {
             'title': scraper.title(),
+            'time': time,
             'recipe_category': scraper.category(),
             'picture_url': scraper.image(),
             'ingredients': ingredients,
