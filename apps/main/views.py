@@ -178,7 +178,7 @@ class HomeViewAPI(ViewSet):
                 'shopping_list_items'
             ).first()
 
-            shopping_list_items = shopping_list_category.shopping_list_items.all()[:4]
+            shopping_list_items = shopping_list_category.shopping_list_items.all()[:4] if shopping_list_category else None
             response = {
                 "selected_shopping_category":
                     self.shopping_category_serializer_class(
