@@ -204,6 +204,11 @@ class HomeViewAPI(ViewSet):
                 f"Shopping List Items with user id: {user_id} not found",
                 status=status.HTTP_400_BAD_REQUEST
             )
+        except Exception as e:
+            return Response(
+                f"Error: {e}",
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     @action(methods=['post'], detail=False, url_path='change-ocr-flag', permission_classes=[permissions.AllowAny])
     def change_ocr_flag(self, request, *args, **kwargs) -> Response:
