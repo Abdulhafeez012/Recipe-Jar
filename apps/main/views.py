@@ -178,7 +178,7 @@ class HomeViewAPI(ViewSet):
                 'shopping_list_items'
             ).first()
 
-            shopping_list_items = shopping_list_category.shopping_list_items.all()[:4]
+            shopping_list_items = shopping_list_category.shopping_list_items.all()[:4] if shopping_list_category else None
             response = {
                 "selected_shopping_category":
                     self.shopping_category_serializer_class(
@@ -202,6 +202,11 @@ class HomeViewAPI(ViewSet):
         except ShoppingListItems.DoesNotExist:
             return Response(
                 f"Shopping List Items with user id: {user_id} not found",
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                f"Error: {e}",
                 status=status.HTTP_400_BAD_REQUEST
             )
 
