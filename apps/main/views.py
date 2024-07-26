@@ -184,11 +184,11 @@ class HomeViewAPI(ViewSet):
                     self.shopping_category_serializer_class(
                         shopping_list_category,
                         many=False
-                    ).data if shopping_list_category else [],
+                    ).data if shopping_list_category else None,
                 "items": self.shopping_serializer_class(
                     shopping_list_items,
                     many=True
-                ).data if shopping_list_items else []
+                ).data if shopping_list_items else None
             }
             return Response(
                 response,
